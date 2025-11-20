@@ -1,0 +1,390 @@
+import { OptimizedContent } from '../types/resume.types';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import fs from 'fs/promises';
+import path from 'path';
+import crypto from 'crypto';
+
+const execAsync = promisify(exec);
+
+export class LaTeXCompilerService {
+  private readonly latexTempDir: string;
+  private readonly outputDir: string;
+  private readonly timeout: number;
+
+  constructor() {
+    this.latexTempDir = path.join(process.cwd(), 'latex-temp');
+    this.outputDir = path.join(process.cwd(), 'uploads', 'resumes');
+    this.timeout = parseInt(process.env.LATEX_TIMEOUT || '30000');
+  }
+
+  /**
+   * Compile LaTeX template with resume data
+   */
+  async compileResume(
+    latexTemplate: string,
+    content: OptimizedContent,
+    _userId: string,
+    company: string,
+    position: string
+  ): Promise<{ fileName: string; filePath: string }> {
+    // Ensure directories exist
+    await this.ensureDirectories();
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const hash = crypto.randomBytes(4).toString('hex');
+    const sanitizedCompany = this.sanitizeFilename(company);
+    const sanitizedPosition = this.sanitizeFilename(position);
+    const fileName = `${sanitizedCompany}_${sanitizedPosition}_${timestamp}_${hash}.pdf`;
+    const baseFileName = `resume_${timestamp}_${hash}`;
+
+    // Create temporary directory for this compilation
+    const tempDir = path.join(this.latexTempDir, baseFileName);
+    await fs.mkdir(tempDir, { recursive: true });
+
+    try {
+      // Render template with content
+      const renderedLatex = this.renderTemplate(latexTemplate, content);
+
+      // Sanitize LaTeX content
+      const sanitizedLatex = this.sanitizeLatexContent(renderedLatex);
+
+      // Write LaTeX file
+      const texFilePath = path.join(tempDir, `${baseFileName}.tex`);
+      await fs.writeFile(texFilePath, sanitizedLatex, 'utf-8');
+
+      // Compile LaTeX to PDF
+      await this.compileLatex(tempDir, baseFileName);
+
+      // Move PDF to output directory
+      const sourcePdfPath = path.join(tempDir, `${baseFileName}.pdf`);
+      const outputPath = path.join(this.outputDir, fileName);
+      await fs.copyFile(sourcePdfPath, outputPath);
+
+      // Clean up temporary directory
+      await this.cleanupTempDir(tempDir);
+
+      return {
+        fileName,
+        filePath: outputPath,
+      };
+    } catch (error: any) {
+      // Clean up on error
+      await this.cleanupTempDir(tempDir);
+      throw new Error(`LaTeX compilation failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Escape special LaTeX characters
+   * Prevents LaTeX injection by escaping special characters
+   */
+  private escapeLatex(text: string): string {
+    if (!text) return '';
+
+    return text
+      .replace(/\\/g, '\\textbackslash{}')
+      .replace(/&/g, '\\&')
+      .replace(/%/g, '\\%')
+      .replace(/\$/g, '\\$')
+      .replace(/#/g, '\\#')
+      .replace(/_/g, '\\_')
+      .replace(/\{/g, '\\{')
+      .replace(/\}/g, '\\}')
+      .replace(/~/g, '\\textasciitilde{}')
+      .replace(/\^/g, '\\textasciicircum{}');
+  }
+
+  /**
+   * Sanitize LaTeX content to prevent injection
+   * Removes potentially dangerous LaTeX commands
+   */
+  private sanitizeLatexContent(latex: string): string {
+    // Remove potentially dangerous commands that could be used for file access or code execution
+    const dangerousCommands = [
+      '\\input',
+      '\\include',
+      '\\write',
+      '\\immediate',
+      '\\openout',
+      '\\closeout',
+      '\\read',
+      '\\openin',
+      '\\closein',
+      '\\csname',
+      '\\expandafter',
+      '\\catcode',
+      '\\def',
+      '\\edef',
+      '\\gdef',
+      '\\xdef',
+      '\\let',
+      '\\futurelet',
+      '\\newcommand',
+      '\\renewcommand',
+      '\\providecommand',
+    ];
+
+    let sanitized = latex;
+    dangerousCommands.forEach((cmd) => {
+      const regex = new RegExp(cmd.replace(/\\/g, '\\\\'), 'gi');
+      sanitized = sanitized.replace(regex, '');
+    });
+
+    return sanitized;
+  }
+
+  /**
+   * Render LaTeX template with content
+   */
+  private renderTemplate(template: string, content: OptimizedContent): string {
+    let rendered = template;
+
+    // Replace personal info
+    rendered = rendered.replace(/\{\{name\}\}/g, this.escapeLatex(content.personalInfo.name));
+    rendered = rendered.replace(/\{\{email\}\}/g, this.escapeLatex(content.personalInfo.email));
+    rendered = rendered.replace(/\{\{phone\}\}/g, this.escapeLatex(content.personalInfo.phone || ''));
+    rendered = rendered.replace(/\{\{location\}\}/g, this.escapeLatex(content.personalInfo.location || ''));
+    rendered = rendered.replace(/\{\{linkedin\}\}/g, this.escapeLatex(content.personalInfo.linkedin || ''));
+    rendered = rendered.replace(/\{\{github\}\}/g, this.escapeLatex(content.personalInfo.github || ''));
+    rendered = rendered.replace(/\{\{website\}\}/g, this.escapeLatex(content.personalInfo.website || ''));
+
+    // Replace summary
+    rendered = rendered.replace(/\{\{summary\}\}/g, this.escapeLatex(content.summary));
+
+    // Replace experience section
+    const experienceLatex = content.experience
+      .map((exp) => {
+        const startDate = this.formatDate(exp.startDate);
+        const endDate = exp.endDate ? this.formatDate(exp.endDate) : 'Present';
+        const achievements = exp.achievements.map((a) => `\\item ${this.escapeLatex(a)}`).join('\n');
+
+        return `\\experience{${this.escapeLatex(exp.position)}}{${this.escapeLatex(exp.company)}}{${startDate} -- ${endDate}}{
+\\begin{itemize}
+${achievements}
+\\end{itemize}
+}`;
+      })
+      .join('\n\n');
+    rendered = rendered.replace(/\{\{experience\}\}/g, experienceLatex);
+
+    // Replace education section
+    const educationLatex = content.education
+      .map((edu) => {
+        const startDate = this.formatDate(edu.startDate);
+        const endDate = edu.endDate ? this.formatDate(edu.endDate) : 'Present';
+        const gpaText = edu.gpa ? ` (GPA: ${edu.gpa})` : '';
+
+        return `\\education{${this.escapeLatex(edu.degree)}}{${this.escapeLatex(edu.institution)}}{${startDate} -- ${endDate}}{${this.escapeLatex(edu.fieldOfStudy)}${gpaText}}`;
+      })
+      .join('\n\n');
+    rendered = rendered.replace(/\{\{education\}\}/g, educationLatex);
+
+    // Replace skills section
+    const skillsByCategory = this.groupSkillsByCategory(content.skills);
+    const skillsLatex = Object.entries(skillsByCategory)
+      .map(([category, skills]) => {
+        const skillNames = skills.map((s) => this.escapeLatex(s.name)).join(', ');
+        return `\\textbf{${this.escapeLatex(category)}:} ${skillNames}`;
+      })
+      .join('\n\n');
+    rendered = rendered.replace(/\{\{skills\}\}/g, skillsLatex);
+
+    // Replace projects section
+    const projectsLatex = content.projects
+      .map((project) => {
+        const highlights = project.highlights.map((h) => `\\item ${this.escapeLatex(h)}`).join('\n');
+        const technologies = project.technologies.join(', ');
+
+        return `\\project{${this.escapeLatex(project.title)}}{${this.escapeLatex(technologies)}}{
+\\begin{itemize}
+${highlights}
+\\end{itemize}
+}`;
+      })
+      .join('\n\n');
+    rendered = rendered.replace(/\{\{projects\}\}/g, projectsLatex);
+
+    return rendered;
+  }
+
+  /**
+   * Escape special LaTeX characters
+   */
+  private escapeLatex(text: string): string {
+    if (!text) return '';
+
+    return text
+      .replace(/\\/g, '\\textbackslash{}')
+      .replace(/[&%$#_{}]/g, '\\$&')
+      .replace(/~/g, '\\textasciitilde{}')
+      .replace(/\^/g, '\\textasciicircum{}');
+  }
+
+  /**
+   * Sanitize LaTeX content to prevent injection
+   */
+  private sanitizeLatexContent(latex: string): string {
+    // Remove potentially dangerous commands
+    const dangerousCommands = [
+      '\\input',
+      '\\include',
+      '\\write',
+      '\\immediate',
+      '\\openout',
+      '\\closeout',
+      '\\read',
+      '\\openin',
+      '\\closein',
+      '\\csname',
+      '\\expandafter',
+      '\\catcode',
+    ];
+
+    let sanitized = latex;
+    dangerousCommands.forEach((cmd) => {
+      const regex = new RegExp(cmd.replace(/\\/g, '\\\\'), 'gi');
+      sanitized = sanitized.replace(regex, '');
+    });
+
+    return sanitized;
+  }
+
+  /**
+   * Compile LaTeX file to PDF using Docker container
+   */
+  private async compileLatex(workDir: string, baseFileName: string): Promise<void> {
+    const texFile = `${baseFileName}.tex`;
+    const containerName = process.env.LATEX_CONTAINER_NAME || 'ats-latex';
+
+    try {
+      // Get absolute path for Docker volume mounting
+      const absoluteWorkDir = path.resolve(workDir);
+
+      // Run pdflatex twice for proper references (needed for TOC, references, etc.)
+      for (let i = 0; i < 2; i++) {
+        // Docker command to execute pdflatex in the container
+        const command = `docker exec ${containerName} pdflatex -interaction=nonstopmode -output-directory=/work "${texFile}"`;
+
+        // Copy files to container
+        await execAsync(`docker cp "${absoluteWorkDir}/." ${containerName}:/work/`, {
+          timeout: 5000,
+        });
+
+        // Execute pdflatex in container
+        await execAsync(command, {
+          timeout: this.timeout,
+          maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+        });
+
+        // Copy PDF back from container
+        const pdfFile = `${baseFileName}.pdf`;
+        await execAsync(`docker cp ${containerName}:/work/${pdfFile} "${absoluteWorkDir}/"`, {
+          timeout: 5000,
+        });
+      }
+
+      // Check if PDF was created
+      const pdfPath = path.join(workDir, `${baseFileName}.pdf`);
+      await fs.access(pdfPath);
+
+      // Clean up files in container
+      await execAsync(`docker exec ${containerName} rm -rf /work/*`, {
+        timeout: 5000,
+      }).catch(() => {
+        // Ignore cleanup errors
+        console.warn('Failed to clean up container work directory');
+      });
+    } catch (error: any) {
+      if (error.killed) {
+        throw new Error('LaTeX compilation timed out after 30 seconds. Please simplify your resume or try a different template.');
+      }
+
+      // Parse LaTeX error for user-friendly message
+      const userMessage = this.parseLatexError(error.message);
+      throw new Error(userMessage);
+    }
+  }
+
+  /**
+   * Parse LaTeX error messages into user-friendly format
+   */
+  private parseLatexError(errorMessage: string): string {
+    // Common LaTeX errors and their user-friendly messages
+    if (errorMessage.includes('Undefined control sequence')) {
+      return 'LaTeX compilation failed: Invalid LaTeX command detected. Please check your template or contact support.';
+    }
+    if (errorMessage.includes('Missing $ inserted')) {
+      return 'LaTeX compilation failed: Mathematical expression formatting error. Please check special characters in your content.';
+    }
+    if (errorMessage.includes('File not found')) {
+      return 'LaTeX compilation failed: Required template file is missing. Please try a different template.';
+    }
+    if (errorMessage.includes('Emergency stop')) {
+      return 'LaTeX compilation failed: Critical error in template. Please try a different template or contact support.';
+    }
+    if (errorMessage.includes('No such container')) {
+      return 'LaTeX compilation service is not available. Please ensure Docker is running and the LaTeX container is started.';
+    }
+
+    // Generic error message
+    return `LaTeX compilation failed: ${errorMessage.substring(0, 200)}. Please try again or contact support if the issue persists.`;
+  }
+
+  /**
+   * Format date for LaTeX
+   */
+  private formatDate(date: Date): string {
+    const d = new Date(date);
+    const month = d.toLocaleString('en-US', { month: 'short' });
+    const year = d.getFullYear();
+    return `${month} ${year}`;
+  }
+
+  /**
+   * Group skills by category
+   */
+  private groupSkillsByCategory(skills: any[]): Record<string, any[]> {
+    const grouped: Record<string, any[]> = {};
+
+    skills.forEach((skill) => {
+      const category = skill.category || 'Other';
+      if (!grouped[category]) {
+        grouped[category] = [];
+      }
+      grouped[category].push(skill);
+    });
+
+    return grouped;
+  }
+
+  /**
+   * Sanitize filename
+   */
+  private sanitizeFilename(name: string): string {
+    return name
+      .replace(/[^a-zA-Z0-9-_]/g, '_')
+      .replace(/_+/g, '_')
+      .substring(0, 50);
+  }
+
+  /**
+   * Ensure required directories exist
+   */
+  private async ensureDirectories(): Promise<void> {
+    await fs.mkdir(this.latexTempDir, { recursive: true });
+    await fs.mkdir(this.outputDir, { recursive: true });
+  }
+
+  /**
+   * Clean up temporary directory
+   */
+  private async cleanupTempDir(tempDir: string): Promise<void> {
+    try {
+      await fs.rm(tempDir, { recursive: true, force: true });
+    } catch (error) {
+      console.warn('Failed to clean up temp directory:', error);
+    }
+  }
+}

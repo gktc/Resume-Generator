@@ -1,0 +1,23 @@
+{
+  "enabled": true,
+  "name": "Format on Save",
+  "description": "Automatically formats code files when they are saved to maintain consistent code style",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.json",
+      "**/*.html",
+      "**/*.css",
+      "**/*.md"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Format the modified file according to the project's code standards. Apply consistent indentation, spacing, and style conventions. For TypeScript/JavaScript files, ensure proper semicolon usage, quote consistency, and line breaks. For JSON files, ensure proper indentation. For HTML/CSS files, apply standard formatting rules. Return the formatted version of the file."
+  }
+}

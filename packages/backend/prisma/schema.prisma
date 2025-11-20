@@ -1,0 +1,291 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// User and Authentication Models
+// ============================================
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  phone        String?
+  location     String?
+  linkedinUrl  String?
+  githubUrl    String?
+  websiteUrl   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  sessions            Session[]
+  workExperiences     WorkExperience[]
+  educations          Education[]
+  skills              Skill[]
+  projects            Project[]
+  jobDescriptions     JobDescription[]
+  resumes             Resume[]
+  interviewQuestions  InterviewQuestion[]
+  interviewExperiences InterviewExperience[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ============================================
+// Profile Data Models
+// ============================================
+
+model WorkExperience {
+  id           String    @id @default(uuid())
+  userId       String
+  company      String
+  position     String
+  startDate    DateTime
+  endDate      DateTime?
+  description  String    @db.Text
+  achievements String[]
+  technologies String[]
+  order        Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, order])
+  @@map("work_experiences")
+}
+
+model Education {
+  id            String    @id @default(uuid())
+  userId        String
+  institution   String
+  degree        String
+  fieldOfStudy  String
+  startDate     DateTime
+  endDate       DateTime?
+  gpa           Float?
+  achievements  String[]
+  order         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, order])
+  @@map("educations")
+}
+
+model Skill {
+  id                String   @id @default(uuid())
+  userId            String
+  name              String
+  category          String   // 'technical', 'soft', 'language', etc.
+  proficiency       String   // 'beginner', 'intermediate', 'advanced', 'expert'
+  yearsOfExperience Int?
+  order             Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, category])
+  @@index([userId, order])
+  @@map("skills")
+}
+
+model Project {
+  id           String    @id @default(uuid())
+  userId       String
+  title        String
+  description  String    @db.Text
+  technologies String[]
+  url          String?
+  githubUrl    String?
+  startDate    DateTime?
+  endDate      DateTime?
+  highlights   String[]
+  order        Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, order])
+  @@map("projects")
+}
+
+// ============================================
+// Job and Resume Models
+// ============================================
+
+model JobDescription {
+  id           String   @id @default(uuid())
+  userId       String
+  company      String
+  position     String
+  rawText      String   @db.Text
+  analyzedData Json     // Stores JobAnalysis structure
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resumes Resume[]
+
+  @@index([userId])
+  @@index([userId, company])
+  @@index([userId, position])
+  @@map("job_descriptions")
+}
+
+model Resume {
+  id                String   @id @default(uuid())
+  userId            String
+  jobDescriptionId  String
+  templateId        String
+  fileName          String
+  filePath          String
+  atsScore          Json     // Stores ATSScore structure
+  generatedContent  Json     // Stores OptimizedContent structure
+  status            String   @default("pending") // 'pending', 'processing', 'completed', 'failed'
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  user              User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobDescription    JobDescription       @relation(fields: [jobDescriptionId], references: [id], onDelete: Cascade)
+  template          Template             @relation(fields: [templateId], references: [id])
+  interviewQuestions InterviewQuestion[]
+
+  @@index([userId])
+  @@index([userId, status])
+  @@index([jobDescriptionId])
+  @@index([templateId])
+  @@map("resumes")
+}
+
+model Template {
+  id              String   @id @default(uuid())
+  name            String
+  description     String   @db.Text
+  category        String   // 'modern', 'classic', 'creative', 'academic', 'technical'
+  previewImageUrl String
+  latexContent    String   @db.Text
+  variables       String[] // List of template variables
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  resumes Resume[]
+
+  @@index([category])
+  @@index([isActive])
+  @@map("templates")
+}
+
+// ============================================
+// Interview Preparation Models
+// ============================================
+
+model InterviewQuestion {
+  id              String   @id @default(uuid())
+  userId          String
+  resumeId        String
+  question        String   @db.Text
+  category        String   // 'technical', 'behavioral', 'experience', 'role-specific'
+  difficulty      String   // 'easy', 'medium', 'hard'
+  relatedContent  String   @db.Text
+  answerFramework String?  @db.Text
+  talkingPoints   String[]
+  createdAt       DateTime @default(now())
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([resumeId])
+  @@index([category])
+  @@map("interview_questions")
+}
+
+model InterviewExperience {
+  id                 String   @id @default(uuid())
+  userId             String
+  company            String
+  role               String
+  interviewDate      DateTime
+  outcome            String   // 'offer', 'rejected', 'pending', 'withdrew'
+  overallDifficulty  String   // 'easy', 'medium', 'hard'
+  preparationTips    String[]
+  isAnonymous        Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relations
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rounds InterviewRound[]
+
+  @@index([userId])
+  @@index([company])
+  @@index([role])
+  @@index([company, role])
+  @@index([isAnonymous])
+  @@map("interview_experiences")
+}
+
+model InterviewRound {
+  id           String   @id @default(uuid())
+  experienceId String
+  roundNumber  Int
+  roundType    String   // 'phone-screen', 'technical', 'system-design', 'behavioral', 'cultural-fit', 'take-home', 'onsite'
+  duration     Int      // minutes
+  difficulty   String   // 'easy', 'medium', 'hard'
+  topics       String[]
+  questions    String[]
+  notes        String   @db.Text
+
+  // Relations
+  experience InterviewExperience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+
+  @@index([experienceId])
+  @@index([roundType])
+  @@map("interview_rounds")
+}
