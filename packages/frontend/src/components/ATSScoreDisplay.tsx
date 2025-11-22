@@ -1,15 +1,37 @@
 import { ATSScore } from '../types/resume.types';
+import { useState, useEffect } from 'react';
+import Ghost from './Ghost';
 
 interface ATSScoreDisplayProps {
   atsScore: ATSScore;
 }
 
 const ATSScoreDisplay = ({ atsScore }: ATSScoreDisplayProps) => {
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
-  };
+  const [animatedScore, setAnimatedScore] = useState(0);
+  const [showGhost, setShowGhost] = useState(false);
+
+  // Animate score on mount
+  useEffect(() => {
+    const duration = 1500;
+    const steps = 60;
+    const increment = atsScore.overall / steps;
+    let currentStep = 0;
+
+    const timer = setInterval(() => {
+      currentStep++;
+      setAnimatedScore(Math.min(Math.round(increment * currentStep), atsScore.overall));
+
+      if (currentStep >= steps) {
+        clearInterval(timer);
+        // Show ghost for high scores
+        if (atsScore.overall >= 80) {
+          setShowGhost(true);
+        }
+      }
+    }, duration / steps);
+
+    return () => clearInterval(timer);
+  }, [atsScore.overall]);
 
   const getScoreLabel = (score: number) => {
     if (score >= 80) return 'Excellent';
@@ -18,95 +40,110 @@ const ATSScoreDisplay = ({ atsScore }: ATSScoreDisplayProps) => {
   };
 
   const breakdownItems = [
-    { label: 'Keyword Match', score: atsScore.breakdown.keywordMatch, icon: '🔑' },
-    { label: 'Experience Relevance', score: atsScore.breakdown.experienceRelevance, icon: '💼' },
-    { label: 'Format Parseability', score: atsScore.breakdown.formatParseability, icon: '📄' },
-    { label: 'Education Match', score: atsScore.breakdown.educationMatch, icon: '🎓' },
+    { label: 'Keyword Match', score: atsScore.breakdown.keywordMatch },
+    { label: 'Experience Relevance', score: atsScore.breakdown.experienceRelevance },
+    { label: 'Format Parseability', score: atsScore.breakdown.formatParseability },
+    { label: 'Education Match', score: atsScore.breakdown.educationMatch },
   ];
+
+  const circumference = 2 * Math.PI * 70;
+  const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
 
   return (
     <div className="space-y-6">
-      {/* Overall Score - Circular Progress */}
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-8">
-        <div className="flex flex-col md:flex-row items-center justify-between">
-          <div className="mb-6 md:mb-0">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">ATS Compatibility Score</h3>
-            <p className="text-gray-600">
-              How well your resume will perform with Applicant Tracking Systems
+      {/* Overall Score - Minimalist Circular Gauge */}
+      <div className="bg-white border-2 border-black rounded-2xl p-8 relative">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="text-center md:text-left">
+            <h3 className="text-3xl font-semibold text-black mb-2">
+              ATS Compatibility Score
+            </h3>
+            <p className="text-gray-600 text-lg">
+              How well your resume performs with Applicant Tracking Systems
             </p>
           </div>
 
-          {/* Circular Progress Indicator */}
-          <div className="relative">
-            <svg className="w-40 h-40 transform -rotate-90">
+          {/* Minimalist Circular Progress Gauge */}
+          <div className="relative flex items-center justify-center">
+            <svg className="w-48 h-48 transform -rotate-90">
               {/* Background circle */}
               <circle
-                cx="80"
-                cy="80"
+                cx="96"
+                cy="96"
                 r="70"
-                stroke="currentColor"
+                stroke="#E5E5E5"
                 strokeWidth="12"
                 fill="none"
-                className="text-gray-200"
               />
               {/* Progress circle */}
               <circle
-                cx="80"
-                cy="80"
+                cx="96"
+                cy="96"
                 r="70"
-                stroke="currentColor"
+                stroke="#000000"
                 strokeWidth="12"
                 fill="none"
-                strokeDasharray={`${2 * Math.PI * 70}`}
-                strokeDashoffset={`${2 * Math.PI * 70 * (1 - atsScore.overall / 100)}`}
-                className={`${
-                  atsScore.overall >= 80
-                    ? 'text-green-500'
-                    : atsScore.overall >= 60
-                    ? 'text-yellow-500'
-                    : 'text-red-500'
-                } transition-all duration-1000`}
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeDashoffset}
+                className="transition-all duration-1000 ease-out"
                 strokeLinecap="round"
               />
             </svg>
+            
+            {/* Center content */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className={`text-4xl font-bold ${getScoreColor(atsScore.overall)}`}>
-                {atsScore.overall}
+              <span className="text-6xl font-bold text-black transition-all duration-500">
+                {animatedScore}
               </span>
-              <span className="text-sm text-gray-600 font-medium">
-                {getScoreLabel(atsScore.overall)}
+              <span className="text-sm text-gray-600 font-medium mt-1 uppercase tracking-wider">
+                {getScoreLabel(animatedScore)}
               </span>
             </div>
+
+            {/* Ghost for high scores */}
+            {showGhost && (
+              <div className="absolute -top-8 -right-8">
+                <Ghost size="lg" animate />
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Score Breakdown */}
-      <div>
-        <h4 className="text-lg font-semibold text-gray-900 mb-4">Score Breakdown</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {breakdownItems.map((item) => (
-            <div key={item.label} className="bg-white border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-2">{item.icon}</span>
-                  <span className="font-medium text-gray-900">{item.label}</span>
-                </div>
-                <span className={`text-xl font-bold ${getScoreColor(item.score)}`}>
-                  {item.score}%
+      {/* Score Breakdown - Minimalist Stat Bars */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6">
+        <h4 className="text-2xl font-semibold text-black mb-6">
+          Score Breakdown
+        </h4>
+        <div className="space-y-4">
+          {breakdownItems.map((item, index) => (
+            <div
+              key={item.label}
+              className="animate-fade-in"
+              style={{
+                animationDelay: `${index * 0.1}s`,
+                animationFillMode: 'both',
+              }}
+            >
+              {/* Stat header */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-gray-900">{item.label}</span>
+                <span className="text-2xl font-bold text-black">
+                  {item.score}
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className={`h-2 rounded-full transition-all duration-500 ${
-                    item.score >= 80
-                      ? 'bg-green-500'
-                      : item.score >= 60
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500'
-                  }`}
-                  style={{ width: `${item.score}%` }}
-                />
+
+              {/* Minimalist stat bar */}
+              <div className="relative">
+                <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="h-full bg-black rounded-full transition-all duration-1000 ease-out"
+                    style={{
+                      width: `${item.score}%`,
+                      animationDelay: `${index * 0.1}s`,
+                    }}
+                  />
+                </div>
               </div>
             </div>
           ))}
@@ -115,31 +152,19 @@ const ATSScoreDisplay = ({ atsScore }: ATSScoreDisplayProps) => {
 
       {/* Missing Keywords */}
       {atsScore.missingKeywords.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-          <h4 className="font-semibold text-yellow-900 mb-3 flex items-center">
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
+        <div className="bg-white border-2 border-gray-900 rounded-xl p-6">
+          <h4 className="text-xl font-semibold text-black mb-3 flex items-center">
+            <span className="mr-2">⚠️</span>
             Missing Keywords ({atsScore.missingKeywords.length})
           </h4>
-          <p className="text-sm text-yellow-800 mb-3">
+          <p className="text-sm text-gray-600 mb-4">
             These keywords from the job description are not present in your resume:
           </p>
           <div className="flex flex-wrap gap-2">
             {atsScore.missingKeywords.map((keyword, index) => (
               <span
                 key={index}
-                className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium"
+                className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-200 transition-colors cursor-default"
               >
                 {keyword}
               </span>
@@ -150,28 +175,23 @@ const ATSScoreDisplay = ({ atsScore }: ATSScoreDisplayProps) => {
 
       {/* Suggestions */}
       {atsScore.suggestions.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h4 className="font-semibold text-blue-900 mb-3 flex items-center">
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-              />
-            </svg>
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <h4 className="text-xl font-semibold text-black mb-4 flex items-center">
+            <span className="mr-2">💡</span>
             Improvement Suggestions
           </h4>
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {atsScore.suggestions.map((suggestion, index) => (
-              <li key={index} className="flex items-start">
-                <span className="text-blue-600 mr-2 mt-1">•</span>
-                <span className="text-blue-900">{suggestion}</span>
+              <li
+                key={index}
+                className="flex items-start bg-gray-50 rounded-lg p-3 border border-gray-200 animate-slide-up"
+                style={{
+                  animationDelay: `${index * 0.1}s`,
+                  animationFillMode: 'both',
+                }}
+              >
+                <span className="text-black mr-3 mt-1 font-bold">→</span>
+                <span className="text-gray-700 leading-relaxed">{suggestion}</span>
               </li>
             ))}
           </ul>
@@ -179,38 +199,42 @@ const ATSScoreDisplay = ({ atsScore }: ATSScoreDisplayProps) => {
       )}
 
       {/* Score Interpretation */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-3">Understanding Your Score</h4>
-        <div className="space-y-3 text-sm">
-          <div className="flex items-start">
-            <div className="w-16 h-8 bg-green-100 border-2 border-green-500 rounded mr-3 flex items-center justify-center">
-              <span className="text-green-700 font-bold text-xs">80-100</span>
+      <div className="bg-white border border-gray-200 rounded-xl p-6">
+        <h4 className="text-xl font-semibold text-black mb-5">
+          Understanding Your Score
+        </h4>
+        <div className="space-y-4">
+          <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-400 transition-colors">
+            <div className="min-w-[80px] h-12 bg-black text-white rounded-lg flex items-center justify-center font-bold">
+              80-100
             </div>
-            <div>
-              <p className="font-medium text-gray-900">Excellent</p>
-              <p className="text-gray-600">
-                Your resume is highly optimized for ATS and should pass most automated screenings.
+            <div className="flex-1">
+              <p className="font-bold text-black mb-1">Excellent</p>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Your resume is highly optimized for ATS and should pass most automated screenings with ease!
               </p>
             </div>
           </div>
-          <div className="flex items-start">
-            <div className="w-16 h-8 bg-yellow-100 border-2 border-yellow-500 rounded mr-3 flex items-center justify-center">
-              <span className="text-yellow-700 font-bold text-xs">60-79</span>
+          
+          <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-400 transition-colors">
+            <div className="min-w-[80px] h-12 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold">
+              60-79
             </div>
-            <div>
-              <p className="font-medium text-gray-900">Good</p>
-              <p className="text-gray-600">
-                Your resume has a decent chance of passing ATS, but could benefit from optimization.
+            <div className="flex-1">
+              <p className="font-bold text-black mb-1">Good</p>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Your resume has a solid chance of passing ATS, but could benefit from some optimization.
               </p>
             </div>
           </div>
-          <div className="flex items-start">
-            <div className="w-16 h-8 bg-red-100 border-2 border-red-500 rounded mr-3 flex items-center justify-center">
-              <span className="text-red-700 font-bold text-xs">0-59</span>
+          
+          <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-400 transition-colors">
+            <div className="min-w-[80px] h-12 bg-gray-300 text-gray-900 rounded-lg flex items-center justify-center font-bold">
+              0-59
             </div>
-            <div>
-              <p className="font-medium text-gray-900">Needs Improvement</p>
-              <p className="text-gray-600">
+            <div className="flex-1">
+              <p className="font-bold text-black mb-1">Needs Improvement</p>
+              <p className="text-gray-600 text-sm leading-relaxed">
                 Your resume may struggle with ATS. Consider adding more relevant keywords and improving formatting.
               </p>
             </div>
