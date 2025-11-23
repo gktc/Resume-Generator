@@ -40,22 +40,22 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const handleCurrentRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsCurrentRole(e.target.checked);
     if (e.target.checked) {
-      setFormData(prev => ({ ...prev, endDate: null }));
+      setFormData((prev) => ({ ...prev, endDate: null }));
     }
   };
 
   const addAchievement = () => {
     if (achievementInput.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         achievements: [...prev.achievements, achievementInput.trim()],
       }));
@@ -64,7 +64,7 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
   };
 
   const removeAchievement = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       achievements: prev.achievements.filter((_, i) => i !== index),
     }));
@@ -72,7 +72,7 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
 
   const addTechnology = () => {
     if (technologyInput.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         technologies: [...prev.technologies, technologyInput.trim()],
       }));
@@ -81,7 +81,7 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
   };
 
   const removeTechnology = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       technologies: prev.technologies.filter((_, i) => i !== index),
     }));
@@ -115,7 +115,7 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validate()) {
       return;
     }
@@ -129,15 +129,13 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">
-        {experience ? 'Edit Work Experience' : 'Add Work Experience'}
-      </h2>
+    <div className="card">
+      <h2 className="page-title">{experience ? 'Edit Work Experience' : 'Add Work Experience'}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Company */}
-        <div>
-          <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="company" className="form-label">
             Company *
           </label>
           <input
@@ -146,17 +144,15 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
             name="company"
             value={formData.company}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              errors.company ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.company ? 'input-field-error' : ''}`}
             placeholder="e.g., Google"
           />
-          {errors.company && <p className="mt-1 text-sm text-red-600">{errors.company}</p>}
+          {errors.company && <p className="form-error-text">{errors.company}</p>}
         </div>
 
         {/* Position */}
-        <div>
-          <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="position" className="form-label">
             Position *
           </label>
           <input
@@ -165,18 +161,16 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
             name="position"
             value={formData.position}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              errors.position ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.position ? 'input-field-error' : ''}`}
             placeholder="e.g., Senior Software Engineer"
           />
-          {errors.position && <p className="mt-1 text-sm text-red-600">{errors.position}</p>}
+          {errors.position && <p className="form-error-text">{errors.position}</p>}
         </div>
 
         {/* Dates */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="form-group">
+            <label htmlFor="startDate" className="form-label">
               Start Date *
             </label>
             <input
@@ -185,15 +179,13 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
               name="startDate"
               value={formData.startDate}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.startDate ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`input-field ${errors.startDate ? 'input-field-error' : ''}`}
             />
-            {errors.startDate && <p className="mt-1 text-sm text-red-600">{errors.startDate}</p>}
+            {errors.startDate && <p className="form-error-text">{errors.startDate}</p>}
           </div>
 
-          <div>
-            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="form-group">
+            <label htmlFor="endDate" className="form-label">
               End Date {!isCurrentRole && '*'}
             </label>
             <input
@@ -203,28 +195,26 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
               value={formData.endDate || ''}
               onChange={handleChange}
               disabled={isCurrentRole}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isCurrentRole ? 'bg-gray-100' : ''
-              } ${errors.endDate ? 'border-red-500' : 'border-gray-300'}`}
+              className={`input-field ${errors.endDate ? 'input-field-error' : ''}`}
             />
-            {errors.endDate && <p className="mt-1 text-sm text-red-600">{errors.endDate}</p>}
+            {errors.endDate && <p className="form-error-text">{errors.endDate}</p>}
             <div className="mt-2">
-              <label className="flex items-center">
+              <label className="checkbox-label">
                 <input
                   type="checkbox"
                   checked={isCurrentRole}
                   onChange={handleCurrentRoleChange}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="checkbox"
                 />
-                <span className="ml-2 text-sm text-gray-700">I currently work here</span>
+                <span>I currently work here</span>
               </label>
             </div>
           </div>
         </div>
 
         {/* Description */}
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="description" className="form-label">
             Description *
           </label>
           <textarea
@@ -233,48 +223,45 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              errors.description ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.description ? 'input-field-error' : ''}`}
             placeholder="Describe your role and responsibilities..."
           />
-          {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
+          {errors.description && <p className="form-error-text">{errors.description}</p>}
         </div>
 
         {/* Achievements */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Key Achievements
-          </label>
+        <div className="form-group">
+          <label className="form-label">Key Achievements</label>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
               value={achievementInput}
               onChange={(e) => setAchievementInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAchievement())}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field flex-1"
               placeholder="Add an achievement and press Enter"
             />
-            <button
-              type="button"
-              onClick={addAchievement}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
+            <button type="button" onClick={addAchievement} className="btn-primary">
               Add
             </button>
           </div>
           {formData.achievements.length > 0 && (
             <ul className="space-y-2">
               {formData.achievements.map((achievement, index) => (
-                <li key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                  <span className="text-gray-700">{achievement}</span>
+                <li key={index} className="list-item flex items-center justify-between">
+                  <span>{achievement}</span>
                   <button
                     type="button"
                     onClick={() => removeAchievement(index)}
-                    className="text-red-600 hover:text-red-700"
+                    className="btn-icon-sm btn-danger"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </li>
@@ -284,42 +271,38 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
         </div>
 
         {/* Technologies */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Technologies Used
-          </label>
+        <div className="form-group">
+          <label className="form-label">Technologies Used</label>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
               value={technologyInput}
               onChange={(e) => setTechnologyInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTechnology())}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field flex-1"
               placeholder="Add a technology and press Enter"
             />
-            <button
-              type="button"
-              onClick={addTechnology}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
+            <button type="button" onClick={addTechnology} className="btn-primary">
               Add
             </button>
           </div>
           {formData.technologies.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {formData.technologies.map((tech, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                >
+                <span key={index} className="skill-tag skill-tag-removable">
                   {tech}
                   <button
                     type="button"
                     onClick={() => removeTechnology(index)}
-                    className="ml-2 text-blue-600 hover:text-blue-800"
+                    className="skill-tag-remove"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </span>
@@ -329,20 +312,16 @@ const WorkExperienceForm = ({ experience, onSubmit, onCancel }: WorkExperienceFo
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-4 pt-4 border-t">
+        <div className="card-footer flex justify-end space-x-4">
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            className="btn-secondary"
             disabled={isSubmitting}
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400"
-            disabled={isSubmitting}
-          >
+          <button type="submit" className="btn-primary" disabled={isSubmitting}>
             {isSubmitting ? 'Saving...' : experience ? 'Update' : 'Add'}
           </button>
         </div>

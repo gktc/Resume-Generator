@@ -26,7 +26,7 @@ const GengarSpinner: React.FC<GengarSpinnerProps> = ({ size = 'md', message }) =
         <div
           className={`${sizeClasses[size]} rounded-full border-4 border-gengar-700 border-t-gengar-400 animate-spin ${glowClasses[size]}`}
         />
-        
+
         {/* Inner pulsing orb */}
         <div
           className={`absolute inset-0 m-auto ${
@@ -36,11 +36,7 @@ const GengarSpinner: React.FC<GengarSpinnerProps> = ({ size = 'md', message }) =
       </div>
 
       {/* Loading message */}
-      {message && (
-        <p className="mt-4 text-gengar-300 font-medium animate-pulse">
-          {message}
-        </p>
-      )}
+      {message && <p className="mt-4 text-gengar-300 font-medium animate-pulse">{message}</p>}
     </div>
   );
 };

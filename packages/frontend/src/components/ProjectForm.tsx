@@ -40,15 +40,15 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value || null }));
+    setFormData((prev) => ({ ...prev, [name]: value || null }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const addTechnology = () => {
     if (technologyInput.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         technologies: [...prev.technologies, technologyInput.trim()],
       }));
@@ -57,7 +57,7 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
   };
 
   const removeTechnology = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       technologies: prev.technologies.filter((_, i) => i !== index),
     }));
@@ -65,7 +65,7 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
 
   const addHighlight = () => {
     if (highlightInput.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         highlights: [...prev.highlights, highlightInput.trim()],
       }));
@@ -74,7 +74,7 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
   };
 
   const removeHighlight = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       highlights: prev.highlights.filter((_, i) => i !== index),
     }));
@@ -99,7 +99,7 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validate()) {
       return;
     }
@@ -113,15 +113,13 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">
-        {project ? 'Edit Project' : 'Add Project'}
-      </h2>
+    <div className="card">
+      <h2 className="page-title">{project ? 'Edit Project' : 'Add Project'}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="title" className="form-label">
             Project Title *
           </label>
           <input
@@ -130,17 +128,15 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-              errors.title ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.title ? 'input-field-error' : ''}`}
             placeholder="e.g., E-commerce Platform"
           />
-          {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+          {errors.title && <p className="form-error-text">{errors.title}</p>}
         </div>
 
         {/* Description */}
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="description" className="form-label">
             Description *
           </label>
           <textarea
@@ -149,51 +145,45 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-              errors.description ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.description ? 'input-field-error' : ''}`}
             placeholder="Describe your project..."
           />
-          {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
+          {errors.description && <p className="form-error-text">{errors.description}</p>}
         </div>
 
         {/* Technologies */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Technologies Used
-          </label>
+        <div className="form-group">
+          <label className="form-label">Technologies Used</label>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
               value={technologyInput}
               onChange={(e) => setTechnologyInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTechnology())}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="input-field flex-1"
               placeholder="Add a technology and press Enter"
             />
-            <button
-              type="button"
-              onClick={addTechnology}
-              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-            >
+            <button type="button" onClick={addTechnology} className="btn-primary">
               Add
             </button>
           </div>
           {formData.technologies.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {formData.technologies.map((tech, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm"
-                >
+                <span key={index} className="skill-tag skill-tag-removable">
                   {tech}
                   <button
                     type="button"
                     onClick={() => removeTechnology(index)}
-                    className="ml-2 text-orange-600 hover:text-orange-800"
+                    className="skill-tag-remove"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </span>
@@ -204,8 +194,8 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
 
         {/* URLs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="form-group">
+            <label htmlFor="url" className="form-label">
               Project URL (Optional)
             </label>
             <input
@@ -214,13 +204,13 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
               name="url"
               value={formData.url || ''}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="input-field"
               placeholder="https://example.com"
             />
           </div>
 
-          <div>
-            <label htmlFor="githubUrl" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="form-group">
+            <label htmlFor="githubUrl" className="form-label">
               GitHub URL (Optional)
             </label>
             <input
@@ -229,7 +219,7 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
               name="githubUrl"
               value={formData.githubUrl || ''}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="input-field"
               placeholder="https://github.com/username/repo"
             />
           </div>
@@ -237,8 +227,8 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
 
         {/* Dates */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="form-group">
+            <label htmlFor="startDate" className="form-label">
               Start Date (Optional)
             </label>
             <input
@@ -247,12 +237,12 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
               name="startDate"
               value={formData.startDate || ''}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
 
-          <div>
-            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="form-group">
+            <label htmlFor="endDate" className="form-label">
               End Date (Optional)
             </label>
             <input
@@ -261,48 +251,45 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
               name="endDate"
               value={formData.endDate || ''}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                errors.endDate ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`input-field ${errors.endDate ? 'input-field-error' : ''}`}
             />
-            {errors.endDate && <p className="mt-1 text-sm text-red-600">{errors.endDate}</p>}
+            {errors.endDate && <p className="form-error-text">{errors.endDate}</p>}
           </div>
         </div>
 
         {/* Highlights */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Project Highlights
-          </label>
+        <div className="form-group">
+          <label className="form-label">Project Highlights</label>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
               value={highlightInput}
               onChange={(e) => setHighlightInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addHighlight())}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="input-field flex-1"
               placeholder="Add a highlight and press Enter"
             />
-            <button
-              type="button"
-              onClick={addHighlight}
-              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-            >
+            <button type="button" onClick={addHighlight} className="btn-primary">
               Add
             </button>
           </div>
           {formData.highlights.length > 0 && (
             <ul className="space-y-2">
               {formData.highlights.map((highlight, index) => (
-                <li key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                  <span className="text-gray-700">{highlight}</span>
+                <li key={index} className="list-item flex items-center justify-between">
+                  <span>{highlight}</span>
                   <button
                     type="button"
                     onClick={() => removeHighlight(index)}
-                    className="text-red-600 hover:text-red-700"
+                    className="btn-icon-sm btn-danger"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </li>
@@ -312,20 +299,16 @@ const ProjectForm = ({ project, onSubmit, onCancel }: ProjectFormProps) => {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-4 pt-4 border-t">
+        <div className="card-footer flex justify-end space-x-4">
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            className="btn-secondary"
             disabled={isSubmitting}
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:bg-orange-400"
-            disabled={isSubmitting}
-          >
+          <button type="submit" className="btn-primary" disabled={isSubmitting}>
             {isSubmitting ? 'Saving...' : project ? 'Update' : 'Add'}
           </button>
         </div>

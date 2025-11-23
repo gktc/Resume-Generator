@@ -53,10 +53,10 @@ const InterviewQuestionsPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Generating interview questions...</p>
-          <p className="mt-2 text-sm text-gray-500">This may take a moment</p>
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p className="text-gray-600">Generating interview questions...</p>
+          <p className="text-sm text-gray-500">This may take a moment</p>
         </div>
       </div>
     );
@@ -65,7 +65,7 @@ const InterviewQuestionsPage = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+        <div className="card max-w-md w-full">
           <div className="text-red-600 text-center mb-4">
             <svg
               className="w-12 h-12 mx-auto mb-2"
@@ -83,10 +83,7 @@ const InterviewQuestionsPage = () => {
             <h2 className="text-xl font-semibold">Error</h2>
           </div>
           <p className="text-gray-700 text-center mb-4">{error}</p>
-          <button
-            onClick={() => navigate('/resume/history')}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-          >
+          <button onClick={() => navigate('/resume/history')} className="btn-primary w-full">
             Back to Resume History
           </button>
         </div>
@@ -112,19 +109,11 @@ const InterviewQuestionsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="page-container">
         {/* Header */}
-        <div className="mb-6">
-          <Link
-            to={`/resume/${resumeId}`}
-            className="text-blue-600 hover:text-blue-700 flex items-center mb-4"
-          >
-            <svg
-              className="w-5 h-5 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+        <div className="page-header">
+          <Link to={`/resume/${resumeId}`} className="back-link">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -134,15 +123,15 @@ const InterviewQuestionsPage = () => {
             </svg>
             Back to Resume
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Interview Preparation</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="page-title">Interview Preparation</h1>
+          <p className="page-subtitle">
             Practice questions tailored to your resume and target position
           </p>
         </div>
 
         {/* Resume and Job Info */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Resume Information</h2>
+        <div className="card mb-6">
+          <h2 className="section-header">Resume Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-500">Company</p>
@@ -170,8 +159,8 @@ const InterviewQuestionsPage = () => {
         </div>
 
         {/* Questions Overview */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Questions by Category</h2>
+        <div className="card mb-6">
+          <h2 className="section-header">Questions by Category</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-blue-50 rounded-lg">
               <p className="text-2xl font-bold text-blue-600">{categoryCount.technical}</p>

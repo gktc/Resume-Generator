@@ -13,7 +13,6 @@ import { checkDatabaseConnection } from './lib/prisma';
 import { testRedisConnection } from './lib/queue';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logging.middleware';
-import { generalRateLimiter } from './middleware/rate-limit.middleware';
 import { logger } from './utils/logger';
 
 // Load environment variables

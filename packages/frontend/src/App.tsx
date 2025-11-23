@@ -45,182 +45,182 @@ function App() {
             <AuthProvider>
               <ToastContainer />
               <Routes>
-                  {/* Public routes */}
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/register" element={<RegisterPage />} />
+                {/* Public routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-                  {/* Protected routes with MainLayout */}
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <DashboardPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
+                {/* Protected routes with MainLayout */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <DashboardPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
-                  {/* Profile routes */}
-                  <Route
-                    path="/profile"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <ProfileDashboardPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/profile/basic-info"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <BasicInfoPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/profile/experience"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <WorkExperiencePage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/profile/education"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <EducationPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/profile/skills"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <SkillsPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/profile/projects"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <ProjectsPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/profile/upload"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <ResumeUploadPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/profile/upload/review/:uploadId"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <ParsedDataReviewPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
+                {/* Profile routes */}
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <ProfileDashboardPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/basic-info"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <BasicInfoPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/experience"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <WorkExperiencePage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/education"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <EducationPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/skills"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <SkillsPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/projects"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <ProjectsPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/upload"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <ResumeUploadPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/upload/review/:uploadId"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <ParsedDataReviewPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
-                  {/* Resume routes */}
-                  <Route
-                    path="/resume/generate"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <ResumeGeneratorPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/resume/history"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <ResumeHistoryPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/resume/:id"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <ResumeDetailPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
+                {/* Resume routes */}
+                <Route
+                  path="/resume/generate"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <ResumeGeneratorPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/resume/history"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <ResumeHistoryPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/resume/:id"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <ResumeDetailPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
-                  {/* Interview routes */}
-                  <Route
-                    path="/interview/questions/:resumeId"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <InterviewQuestionsPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/interview/experience/new"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <InterviewExperienceFormPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/interview/search"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <CompanySearchPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/interview/insights/:company/:role"
-                    element={
-                      <ProtectedRoute>
-                        <MainLayout>
-                          <InterviewInsightsPage />
-                        </MainLayout>
-                      </ProtectedRoute>
-                    }
-                  />
+                {/* Interview routes */}
+                <Route
+                  path="/interview/questions/:resumeId"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <InterviewQuestionsPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/interview/experience/new"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <InterviewExperienceFormPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/interview/search"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <CompanySearchPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/interview/insights/:company/:role"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <InterviewInsightsPage />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
-                  {/* Redirects and 404 */}
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
+                {/* Redirects and 404 */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
             </AuthProvider>
           </ToastProvider>
         </BrowserRouter>

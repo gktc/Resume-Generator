@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api, { tokenManager } from '../lib/api';
-import { User, LoginCredentials, RegisterData, AuthContextType, AuthResponse } from '../types/auth.types';
+import {
+  User,
+  LoginCredentials,
+  RegisterData,
+  AuthContextType,
+  AuthResponse,
+} from '../types/auth.types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -37,7 +43,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      const response = await api.post<{ success: boolean; data: AuthResponse }>('/auth/login', credentials);
+      const response = await api.post<{ success: boolean; data: AuthResponse }>(
+        '/auth/login',
+        credentials
+      );
       const { user, accessToken, refreshToken } = response.data.data;
 
       tokenManager.setTokens(accessToken, refreshToken);
@@ -51,7 +60,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (data: RegisterData) => {
     try {
-      const response = await api.post<{ success: boolean; data: AuthResponse }>('/auth/register', data);
+      const response = await api.post<{ success: boolean; data: AuthResponse }>(
+        '/auth/register',
+        data
+      );
       const { user, accessToken, refreshToken } = response.data.data;
 
       tokenManager.setTokens(accessToken, refreshToken);

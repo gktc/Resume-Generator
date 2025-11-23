@@ -13,7 +13,10 @@ const ResumeUploader = ({ onUploadSuccess }: ResumeUploaderProps) => {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const ALLOWED_TYPES = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  const ALLOWED_TYPES = [
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  ];
   const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
   const validateFile = (file: File): string | null => {
@@ -64,7 +67,7 @@ const ResumeUploader = ({ onUploadSuccess }: ResumeUploaderProps) => {
   const handleFileSelect = (selectedFile: File) => {
     setError(null);
     const validationError = validateFile(selectedFile);
-    
+
     if (validationError) {
       setError(validationError);
       return;
@@ -127,7 +130,7 @@ const ResumeUploader = ({ onUploadSuccess }: ResumeUploaderProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-8">
+    <div className="card">
       <input
         ref={fileInputRef}
         type="file"
@@ -161,26 +164,29 @@ const ResumeUploader = ({ onUploadSuccess }: ResumeUploaderProps) => {
               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
             />
           </svg>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Drop your resume here
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Drop your resume here</h3>
           <p className="text-gray-600 mb-4">or</p>
-          <button
-            onClick={handleBrowseClick}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-          >
+          <button onClick={handleBrowseClick} className="btn-primary">
             Browse Files
           </button>
-          <p className="text-sm text-gray-500 mt-4">
-            Supported formats: PDF, DOCX (Max 10MB)
-          </p>
+          <p className="text-sm text-gray-500 mt-4">Supported formats: PDF, DOCX (Max 10MB)</p>
         </div>
       ) : (
         <div>
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg mb-4">
+          <div className="list-item flex items-center justify-between mb-4">
             <div className="flex items-center flex-1">
-              <svg className="w-10 h-10 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                className="w-10 h-10 text-blue-600 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
               <div className="flex-1">
                 <p className="font-medium text-gray-900">{file.name}</p>
@@ -190,11 +196,16 @@ const ResumeUploader = ({ onUploadSuccess }: ResumeUploaderProps) => {
             {!isUploading && (
               <button
                 onClick={handleRemoveFile}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                className="btn-icon-sm text-red-600 hover:bg-red-50"
                 title="Remove file"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             )}
@@ -216,10 +227,7 @@ const ResumeUploader = ({ onUploadSuccess }: ResumeUploaderProps) => {
           )}
 
           {!isUploading && (
-            <button
-              onClick={handleUpload}
-              className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
-            >
+            <button onClick={handleUpload} className="btn-primary w-full">
               Upload and Parse Resume
             </button>
           )}
@@ -227,11 +235,15 @@ const ResumeUploader = ({ onUploadSuccess }: ResumeUploaderProps) => {
       )}
 
       {error && (
-        <div className="mt-4 p-4 bg-red-50 text-red-800 rounded-lg flex items-start">
-          <svg className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+        <div className="notification-error mt-4">
+          <svg className="notification-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clipRule="evenodd"
+            />
           </svg>
-          <span>{error}</span>
+          <span className="notification-content">{error}</span>
         </div>
       )}
     </div>

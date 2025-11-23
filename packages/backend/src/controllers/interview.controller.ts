@@ -337,7 +337,7 @@ export class InterviewController {
    * Get list of available companies
    * GET /api/interview/insights
    */
-  async getAvailableCompanies(req: Request, res: Response) {
+  async getAvailableCompanies(_req: Request, res: Response) {
     try {
       const companies = await communityService.getAvailableCompanies();
 

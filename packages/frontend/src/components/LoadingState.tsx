@@ -34,7 +34,8 @@ const LoadingState: React.FC<LoadingStateProps> = ({
     }
   }, [pokemonMessages, message]);
 
-  const displayMessage = message || (pokemonMessages ? pokemonLoadingMessages[currentMessage] : undefined);
+  const displayMessage =
+    message || (pokemonMessages ? pokemonLoadingMessages[currentMessage] : undefined);
 
   return (
     <div className="relative flex items-center justify-center min-h-[300px] animate-fade-in">

@@ -1,6 +1,6 @@
 /**
  * Gengar Ghost-Type Theme Utilities
- * 
+ *
  * This file contains theme constants, utility functions, and helpers
  * for the Gengar-themed ATS Resume Builder.
  */
@@ -134,13 +134,16 @@ export const getButtonClasses = (
   className: string = ''
 ): string => {
   const baseClasses = 'px-6 py-3 rounded-lg font-medium transition-all duration-300';
-  
+
   const variantClasses = {
-    primary: 'bg-gengar-500 text-white hover:bg-gengar-400 shadow-gengar-glow hover:shadow-gengar-glow-lg hover:scale-105 active:scale-95',
-    secondary: 'bg-transparent border-2 border-gengar-500 text-gengar-300 hover:bg-gengar-500 hover:text-white hover:shadow-gengar-glow',
-    danger: 'bg-gengar-red text-white hover:bg-red-600 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95',
+    primary:
+      'bg-gengar-500 text-white hover:bg-gengar-400 shadow-gengar-glow hover:shadow-gengar-glow-lg hover:scale-105 active:scale-95',
+    secondary:
+      'bg-transparent border-2 border-gengar-500 text-gengar-300 hover:bg-gengar-500 hover:text-white hover:shadow-gengar-glow',
+    danger:
+      'bg-gengar-red text-white hover:bg-red-600 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95',
   };
-  
+
   return `${baseClasses} ${variantClasses[variant]} ${className}`.trim();
 };
 
@@ -151,9 +154,12 @@ export const getButtonClasses = (
  * @returns Combined class string
  */
 export const getCardClasses = (hover: boolean = false, className: string = ''): string => {
-  const baseClasses = 'rounded-xl p-6 bg-bg-secondary border border-gengar-600 shadow-gengar-shadow backdrop-blur-sm transition-all duration-300';
-  const hoverClasses = hover ? 'hover:border-gengar-400 hover:shadow-gengar-glow-lg hover:-translate-y-2 hover:scale-[1.02]' : '';
-  
+  const baseClasses =
+    'rounded-xl p-6 bg-bg-secondary border border-gengar-600 shadow-gengar-shadow backdrop-blur-sm transition-all duration-300';
+  const hoverClasses = hover
+    ? 'hover:border-gengar-400 hover:shadow-gengar-glow-lg hover:-translate-y-2 hover:scale-[1.02]'
+    : '';
+
   return `${baseClasses} ${hoverClasses} ${className}`.trim();
 };
 
@@ -163,8 +169,9 @@ export const getCardClasses = (hover: boolean = false, className: string = ''): 
  * @returns Combined class string
  */
 export const getInputClasses = (className: string = ''): string => {
-  const baseClasses = 'w-full px-4 py-3 rounded-lg bg-bg-tertiary border-2 border-gengar-600 text-gengar-100 placeholder-gengar-700 focus:border-gengar-400 focus:shadow-gengar-glow focus:outline-none transition-all duration-300';
-  
+  const baseClasses =
+    'w-full px-4 py-3 rounded-lg bg-bg-tertiary border-2 border-gengar-600 text-gengar-100 placeholder-gengar-700 focus:border-gengar-400 focus:shadow-gengar-glow focus:outline-none transition-all duration-300';
+
   return `${baseClasses} ${className}`.trim();
 };
 

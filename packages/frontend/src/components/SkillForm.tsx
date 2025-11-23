@@ -30,12 +30,12 @@ const SkillForm = ({ skill, onSubmit, onCancel }: SkillFormProps) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: type === 'number' ? (value ? parseInt(value) : null) : value,
     }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
@@ -55,7 +55,7 @@ const SkillForm = ({ skill, onSubmit, onCancel }: SkillFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validate()) {
       return;
     }
@@ -69,15 +69,13 @@ const SkillForm = ({ skill, onSubmit, onCancel }: SkillFormProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">
-        {skill ? 'Edit Skill' : 'Add Skill'}
-      </h2>
+    <div className="card">
+      <h2 className="page-title">{skill ? 'Edit Skill' : 'Add Skill'}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Skill Name */}
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="name" className="form-label">
             Skill Name *
           </label>
           <input
@@ -86,17 +84,15 @@ const SkillForm = ({ skill, onSubmit, onCancel }: SkillFormProps) => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-              errors.name ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.name ? 'input-field-error' : ''}`}
             placeholder="e.g., JavaScript, Leadership, Spanish"
           />
-          {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+          {errors.name && <p className="form-error-text">{errors.name}</p>}
         </div>
 
         {/* Category */}
-        <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="category" className="form-label">
             Category *
           </label>
           <select
@@ -104,7 +100,7 @@ const SkillForm = ({ skill, onSubmit, onCancel }: SkillFormProps) => {
             name="category"
             value={formData.category}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="input-field"
           >
             <option value="technical">Technical</option>
             <option value="soft">Soft Skills</option>
@@ -113,8 +109,8 @@ const SkillForm = ({ skill, onSubmit, onCancel }: SkillFormProps) => {
         </div>
 
         {/* Proficiency */}
-        <div>
-          <label htmlFor="proficiency" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="proficiency" className="form-label">
             Proficiency Level *
           </label>
           <select
@@ -122,7 +118,7 @@ const SkillForm = ({ skill, onSubmit, onCancel }: SkillFormProps) => {
             name="proficiency"
             value={formData.proficiency}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="input-field"
           >
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
@@ -132,8 +128,8 @@ const SkillForm = ({ skill, onSubmit, onCancel }: SkillFormProps) => {
         </div>
 
         {/* Years of Experience */}
-        <div>
-          <label htmlFor="yearsOfExperience" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="yearsOfExperience" className="form-label">
             Years of Experience (Optional)
           </label>
           <input
@@ -143,29 +139,25 @@ const SkillForm = ({ skill, onSubmit, onCancel }: SkillFormProps) => {
             value={formData.yearsOfExperience || ''}
             onChange={handleChange}
             min="0"
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-              errors.yearsOfExperience ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.yearsOfExperience ? 'input-field-error' : ''}`}
             placeholder="e.g., 5"
           />
-          {errors.yearsOfExperience && <p className="mt-1 text-sm text-red-600">{errors.yearsOfExperience}</p>}
+          {errors.yearsOfExperience && (
+            <p className="form-error-text">{errors.yearsOfExperience}</p>
+          )}
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-4 pt-4 border-t">
+        <div className="card-footer flex justify-end space-x-4">
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            className="btn-secondary"
             disabled={isSubmitting}
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-purple-400"
-            disabled={isSubmitting}
-          >
+          <button type="submit" className="btn-primary" disabled={isSubmitting}>
             {isSubmitting ? 'Saving...' : skill ? 'Update' : 'Add'}
           </button>
         </div>

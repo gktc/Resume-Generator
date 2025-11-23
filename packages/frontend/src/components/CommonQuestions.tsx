@@ -23,12 +23,13 @@ const CommonQuestions: React.FC<CommonQuestionsProps> = ({ questions }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // Get unique categories
-  const categories = ['all', ...Array.from(new Set(questions.map(q => q.category)))];
+  const categories = ['all', ...Array.from(new Set(questions.map((q) => q.category)))];
 
   // Filter questions by category
-  const filteredQuestions = selectedCategory === 'all'
-    ? questions
-    : questions.filter(q => q.category === selectedCategory);
+  const filteredQuestions =
+    selectedCategory === 'all'
+      ? questions
+      : questions.filter((q) => q.category === selectedCategory);
 
   // Sort by frequency (descending)
   const sortedQuestions = [...filteredQuestions].sort((a, b) => b.frequency - a.frequency);
@@ -49,7 +50,12 @@ const CommonQuestions: React.FC<CommonQuestionsProps> = ({ questions }) => {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            {category === 'all' ? 'All' : category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            {category === 'all'
+              ? 'All'
+              : category
+                  .split('-')
+                  .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                  .join(' ')}
           </button>
         ))}
       </div>
@@ -71,7 +77,10 @@ const CommonQuestions: React.FC<CommonQuestionsProps> = ({ questions }) => {
                         categoryColors[q.category] || categoryColors.general
                       }`}
                     >
-                      {q.category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                      {q.category
+                        .split('-')
+                        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                        .join(' ')}
                     </span>
                   </div>
                 </div>

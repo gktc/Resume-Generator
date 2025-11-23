@@ -7,7 +7,6 @@ import {
   InvalidCredentialsError,
   InvalidTokenError,
   UserNotFoundError,
-  DatabaseError,
 } from '../utils/errors';
 import { logger } from '../utils/logger';
 

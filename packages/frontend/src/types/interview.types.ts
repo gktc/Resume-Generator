@@ -24,7 +24,14 @@ export interface InterviewQuestionsResponse {
 // Interview Experience Types
 export interface InterviewRound {
   roundNumber: number;
-  roundType: 'phone-screen' | 'technical' | 'system-design' | 'behavioral' | 'cultural-fit' | 'take-home' | 'onsite';
+  roundType:
+    | 'phone-screen'
+    | 'technical'
+    | 'system-design'
+    | 'behavioral'
+    | 'cultural-fit'
+    | 'take-home'
+    | 'onsite';
   duration: number;
   difficulty: 'easy' | 'medium' | 'hard';
   topics: string[];

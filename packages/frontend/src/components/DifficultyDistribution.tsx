@@ -22,8 +22,9 @@ const DifficultyDistributionComponent: React.FC<DifficultyDistributionProps> = (
   topicFrequency,
   successTips,
 }) => {
-  const total = difficultyDistribution.easy + difficultyDistribution.medium + difficultyDistribution.hard;
-  
+  const total =
+    difficultyDistribution.easy + difficultyDistribution.medium + difficultyDistribution.hard;
+
   const easyPercent = total > 0 ? (difficultyDistribution.easy / total) * 100 : 0;
   const mediumPercent = total > 0 ? (difficultyDistribution.medium / total) * 100 : 0;
   const hardPercent = total > 0 ? (difficultyDistribution.hard / total) * 100 : 0;
@@ -37,7 +38,7 @@ const DifficultyDistributionComponent: React.FC<DifficultyDistributionProps> = (
       {/* Difficulty Distribution */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Difficulty Distribution</h2>
-        
+
         <div className="space-y-4">
           {/* Easy */}
           <div>
@@ -99,22 +100,24 @@ const DifficultyDistributionComponent: React.FC<DifficultyDistributionProps> = (
       {/* Topic Frequency */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Common Topics</h2>
-        
+
         {sortedTopics.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {sortedTopics.map((topic, index) => {
               // Calculate size based on frequency
-              const sizeClass = topic.frequency >= maxFrequency * 0.7
-                ? 'text-lg px-4 py-2'
-                : topic.frequency >= maxFrequency * 0.4
-                ? 'text-base px-3 py-2'
-                : 'text-sm px-3 py-1';
-              
-              const colorClass = topic.frequency >= maxFrequency * 0.7
-                ? 'bg-blue-600 text-white'
-                : topic.frequency >= maxFrequency * 0.4
-                ? 'bg-blue-500 text-white'
-                : 'bg-blue-100 text-blue-800';
+              const sizeClass =
+                topic.frequency >= maxFrequency * 0.7
+                  ? 'text-lg px-4 py-2'
+                  : topic.frequency >= maxFrequency * 0.4
+                    ? 'text-base px-3 py-2'
+                    : 'text-sm px-3 py-1';
+
+              const colorClass =
+                topic.frequency >= maxFrequency * 0.7
+                  ? 'bg-blue-600 text-white'
+                  : topic.frequency >= maxFrequency * 0.4
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-blue-100 text-blue-800';
 
               return (
                 <span
@@ -135,7 +138,7 @@ const DifficultyDistributionComponent: React.FC<DifficultyDistributionProps> = (
       {/* Success Tips */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Preparation Tips</h2>
-        
+
         {successTips.length > 0 ? (
           <ul className="space-y-3">
             {successTips.map((tip, index) => (

@@ -12,16 +12,16 @@ interface ProcessTimelineProps {
 
 const roundTypeLabels: Record<string, string> = {
   'phone-screen': 'Phone Screen',
-  'technical': 'Technical',
+  technical: 'Technical',
   'system-design': 'System Design',
-  'behavioral': 'Behavioral',
+  behavioral: 'Behavioral',
   'cultural-fit': 'Cultural Fit',
   'take-home': 'Take Home',
-  'onsite': 'Onsite',
+  onsite: 'Onsite',
 };
 
 const ProcessTimeline: React.FC<ProcessTimelineProps> = ({ processStructure }) => {
-  const maxFrequency = Math.max(...processStructure.commonRoundTypes.map(r => r.frequency));
+  const maxFrequency = Math.max(...processStructure.commonRoundTypes.map((r) => r.frequency));
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -46,7 +46,8 @@ const ProcessTimeline: React.FC<ProcessTimelineProps> = ({ processStructure }) =
           <div className="text-sm text-gray-600 mb-1">Most Common Round</div>
           <div className="text-lg font-bold text-purple-600">
             {processStructure.commonRoundTypes.length > 0
-              ? roundTypeLabels[processStructure.commonRoundTypes[0].type] || processStructure.commonRoundTypes[0].type
+              ? roundTypeLabels[processStructure.commonRoundTypes[0].type] ||
+                processStructure.commonRoundTypes[0].type
               : 'N/A'}
           </div>
         </div>
@@ -61,9 +62,7 @@ const ProcessTimeline: React.FC<ProcessTimelineProps> = ({ processStructure }) =
                 <span className="text-sm font-medium text-gray-700">
                   {roundTypeLabels[round.type] || round.type}
                 </span>
-                <span className="text-sm text-gray-600">
-                  {(round.frequency * 100).toFixed(0)}%
-                </span>
+                <span className="text-sm text-gray-600">{(round.frequency * 100).toFixed(0)}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div

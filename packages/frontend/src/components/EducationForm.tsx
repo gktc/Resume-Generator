@@ -39,25 +39,25 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: type === 'number' ? (value ? parseFloat(value) : null) : value,
     }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const handleCurrentlyStudyingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsCurrentlyStudying(e.target.checked);
     if (e.target.checked) {
-      setFormData(prev => ({ ...prev, endDate: null }));
+      setFormData((prev) => ({ ...prev, endDate: null }));
     }
   };
 
   const addAchievement = () => {
     if (achievementInput.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         achievements: [...prev.achievements, achievementInput.trim()],
       }));
@@ -66,7 +66,7 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
   };
 
   const removeAchievement = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       achievements: prev.achievements.filter((_, i) => i !== index),
     }));
@@ -103,7 +103,7 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validate()) {
       return;
     }
@@ -117,15 +117,13 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">
-        {education ? 'Edit Education' : 'Add Education'}
-      </h2>
+    <div className="card">
+      <h2 className="page-title">{education ? 'Edit Education' : 'Add Education'}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Institution */}
-        <div>
-          <label htmlFor="institution" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="institution" className="form-label">
             Institution *
           </label>
           <input
@@ -134,17 +132,15 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
             name="institution"
             value={formData.institution}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-              errors.institution ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.institution ? 'input-field-error' : ''}`}
             placeholder="e.g., Stanford University"
           />
-          {errors.institution && <p className="mt-1 text-sm text-red-600">{errors.institution}</p>}
+          {errors.institution && <p className="form-error-text">{errors.institution}</p>}
         </div>
 
         {/* Degree */}
-        <div>
-          <label htmlFor="degree" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="degree" className="form-label">
             Degree *
           </label>
           <input
@@ -153,17 +149,15 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
             name="degree"
             value={formData.degree}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-              errors.degree ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.degree ? 'input-field-error' : ''}`}
             placeholder="e.g., Bachelor of Science"
           />
-          {errors.degree && <p className="mt-1 text-sm text-red-600">{errors.degree}</p>}
+          {errors.degree && <p className="form-error-text">{errors.degree}</p>}
         </div>
 
         {/* Field of Study */}
-        <div>
-          <label htmlFor="fieldOfStudy" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="fieldOfStudy" className="form-label">
             Field of Study *
           </label>
           <input
@@ -172,18 +166,16 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
             name="fieldOfStudy"
             value={formData.fieldOfStudy}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-              errors.fieldOfStudy ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.fieldOfStudy ? 'input-field-error' : ''}`}
             placeholder="e.g., Computer Science"
           />
-          {errors.fieldOfStudy && <p className="mt-1 text-sm text-red-600">{errors.fieldOfStudy}</p>}
+          {errors.fieldOfStudy && <p className="form-error-text">{errors.fieldOfStudy}</p>}
         </div>
 
         {/* Dates */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="form-group">
+            <label htmlFor="startDate" className="form-label">
               Start Date *
             </label>
             <input
@@ -192,15 +184,13 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
               name="startDate"
               value={formData.startDate}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                errors.startDate ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`input-field ${errors.startDate ? 'input-field-error' : ''}`}
             />
-            {errors.startDate && <p className="mt-1 text-sm text-red-600">{errors.startDate}</p>}
+            {errors.startDate && <p className="form-error-text">{errors.startDate}</p>}
           </div>
 
-          <div>
-            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="form-group">
+            <label htmlFor="endDate" className="form-label">
               End Date {!isCurrentlyStudying && '*'}
             </label>
             <input
@@ -210,28 +200,26 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
               value={formData.endDate || ''}
               onChange={handleChange}
               disabled={isCurrentlyStudying}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                isCurrentlyStudying ? 'bg-gray-100' : ''
-              } ${errors.endDate ? 'border-red-500' : 'border-gray-300'}`}
+              className={`input-field ${errors.endDate ? 'input-field-error' : ''}`}
             />
-            {errors.endDate && <p className="mt-1 text-sm text-red-600">{errors.endDate}</p>}
+            {errors.endDate && <p className="form-error-text">{errors.endDate}</p>}
             <div className="mt-2">
-              <label className="flex items-center">
+              <label className="checkbox-label">
                 <input
                   type="checkbox"
                   checked={isCurrentlyStudying}
                   onChange={handleCurrentlyStudyingChange}
-                  className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                  className="checkbox"
                 />
-                <span className="ml-2 text-sm text-gray-700">Currently studying here</span>
+                <span>Currently studying here</span>
               </label>
             </div>
           </div>
         </div>
 
         {/* GPA */}
-        <div>
-          <label htmlFor="gpa" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="form-group">
+          <label htmlFor="gpa" className="form-label">
             GPA (Optional)
           </label>
           <input
@@ -243,48 +231,50 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
             step="0.01"
             min="0"
             max="4.0"
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-              errors.gpa ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`input-field ${errors.gpa ? 'input-field-error' : ''}`}
             placeholder="e.g., 3.75"
           />
-          {errors.gpa && <p className="mt-1 text-sm text-red-600">{errors.gpa}</p>}
+          {errors.gpa && <p className="form-error-text">{errors.gpa}</p>}
         </div>
 
         {/* Achievements */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Achievements (Optional)
-          </label>
+        <div className="form-group">
+          <label className="form-label">Achievements (Optional)</label>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
               value={achievementInput}
               onChange={(e) => setAchievementInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAchievement())}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addAchievement();
+                }
+              }}
+              className="input-field flex-1"
               placeholder="Add an achievement and press Enter"
             />
-            <button
-              type="button"
-              onClick={addAchievement}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-            >
+            <button type="button" onClick={addAchievement} className="btn-primary">
               Add
             </button>
           </div>
           {formData.achievements.length > 0 && (
             <ul className="space-y-2">
               {formData.achievements.map((achievement, index) => (
-                <li key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                  <span className="text-gray-700">{achievement}</span>
+                <li key={index} className="list-item flex items-center justify-between">
+                  <span>{achievement}</span>
                   <button
                     type="button"
                     onClick={() => removeAchievement(index)}
-                    className="text-red-600 hover:text-red-700"
+                    className="btn-icon-sm btn-danger"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </li>
@@ -294,20 +284,16 @@ const EducationForm = ({ education, onSubmit, onCancel }: EducationFormProps) =>
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-4 pt-4 border-t">
+        <div className="card-footer flex justify-end space-x-4">
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            className="btn-secondary"
             disabled={isSubmitting}
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-green-400"
-            disabled={isSubmitting}
-          >
+          <button type="submit" className="btn-primary" disabled={isSubmitting}>
             {isSubmitting ? 'Saving...' : education ? 'Update' : 'Add'}
           </button>
         </div>

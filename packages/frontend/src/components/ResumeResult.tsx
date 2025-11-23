@@ -19,7 +19,7 @@ const ResumeResult = ({ resume, onGenerateAnother }: ResumeResultProps) => {
       try {
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
         const token = localStorage.getItem('accessToken');
-        
+
         const response = await fetch(`${API_URL}/api/resume/${resume.id}/download`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -55,7 +55,7 @@ const ResumeResult = ({ resume, onGenerateAnother }: ResumeResultProps) => {
       // Create a download link
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const token = localStorage.getItem('accessToken');
-      
+
       const response = await fetch(`${API_URL}/api/resume/${resume.id}/download`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -99,9 +99,7 @@ const ResumeResult = ({ resume, onGenerateAnother }: ResumeResultProps) => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Resume Generated Successfully! 🎉</h2>
-            <p className="text-gray-600 mt-1">
-              Your ATS-optimized resume is ready for download
-            </p>
+            <p className="text-gray-600 mt-1">Your ATS-optimized resume is ready for download</p>
           </div>
           <div className="flex items-center space-x-2">
             <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
@@ -121,9 +119,7 @@ const ResumeResult = ({ resume, onGenerateAnother }: ResumeResultProps) => {
             </div>
             <div>
               <span className="text-gray-600">Company:</span>
-              <p className="font-medium text-gray-900">
-                {resume.jobDescription?.company || 'N/A'}
-              </p>
+              <p className="font-medium text-gray-900">{resume.jobDescription?.company || 'N/A'}</p>
             </div>
             <div>
               <span className="text-gray-600">Generated:</span>
@@ -151,16 +147,22 @@ const ResumeResult = ({ resume, onGenerateAnother }: ResumeResultProps) => {
                 </div>
               </div>
             ) : pdfUrl ? (
-              <iframe
-                src={pdfUrl}
-                className="w-full h-full"
-                title="Resume Preview"
-              />
+              <iframe src={pdfUrl} className="w-full h-full" title="Resume Preview" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <div className="text-center text-gray-600">
-                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <svg
+                    className="w-16 h-16 mx-auto mb-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
                   </svg>
                   <p>Preview not available</p>
                   <p className="text-sm mt-2">Use the download button below</p>
@@ -214,12 +216,7 @@ const ResumeResult = ({ resume, onGenerateAnother }: ResumeResultProps) => {
           className="flex items-center justify-center px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Generate Another
         </button>

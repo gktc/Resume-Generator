@@ -141,7 +141,7 @@ const InterviewExperienceFormPage: React.FC = () => {
 
   const handleNext = () => {
     setError(null);
-    
+
     if (currentStep === 'basic') {
       if (validateBasicInfo()) {
         setCurrentStep('rounds');
@@ -168,13 +168,13 @@ const InterviewExperienceFormPage: React.FC = () => {
 
     try {
       // Filter out empty tips
-      const filteredTips = preparationTips.filter(tip => tip.trim() !== '');
+      const filteredTips = preparationTips.filter((tip) => tip.trim() !== '');
 
       // Clean up rounds data
-      const cleanedRounds = rounds.map(round => ({
+      const cleanedRounds = rounds.map((round) => ({
         ...round,
-        topics: round.topics.filter(t => t.trim() !== ''),
-        questions: round.questions.filter(q => q.trim() !== ''),
+        topics: round.topics.filter((t) => t.trim() !== ''),
+        questions: round.questions.filter((q) => q.trim() !== ''),
       }));
 
       const experienceData: InterviewExperienceInput = {
@@ -188,7 +188,7 @@ const InterviewExperienceFormPage: React.FC = () => {
       };
 
       await api.post('/interview/experience', experienceData);
-      
+
       // Show success message and redirect
       alert('Interview experience submitted successfully!');
       navigate(`/interview/insights/${encodeURIComponent(company)}/${encodeURIComponent(role)}`);
@@ -201,42 +201,55 @@ const InterviewExperienceFormPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Share Your Interview Experience</h1>
-          <p className="text-gray-600 mb-6">
+      <div className="page-container max-w-4xl">
+        <div className="card">
+          <h1 className="page-title">Share Your Interview Experience</h1>
+          <p className="page-subtitle mb-6">
             Help others prepare by sharing your interview experience anonymously
           </p>
 
           {/* Progress indicator */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                currentStep === 'basic' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'
-              }`}>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  currentStep === 'basic' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'
+                }`}
+              >
                 1
               </div>
               <span className="ml-2 text-sm font-medium">Basic Info</span>
             </div>
             <div className="flex-1 h-1 mx-4 bg-gray-200">
-              <div className={`h-full ${currentStep !== 'basic' ? 'bg-green-600' : 'bg-gray-200'}`} />
+              <div
+                className={`h-full ${currentStep !== 'basic' ? 'bg-green-600' : 'bg-gray-200'}`}
+              />
             </div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                currentStep === 'rounds' ? 'bg-blue-600 text-white' : 
-                currentStep === 'tips' ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-600'
-              }`}>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  currentStep === 'rounds'
+                    ? 'bg-blue-600 text-white'
+                    : currentStep === 'tips'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-300 text-gray-600'
+                }`}
+              >
                 2
               </div>
               <span className="ml-2 text-sm font-medium">Interview Rounds</span>
             </div>
             <div className="flex-1 h-1 mx-4 bg-gray-200">
-              <div className={`h-full ${currentStep === 'tips' ? 'bg-green-600' : 'bg-gray-200'}`} />
+              <div
+                className={`h-full ${currentStep === 'tips' ? 'bg-green-600' : 'bg-gray-200'}`}
+              />
             </div>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                currentStep === 'tips' ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'
-              }`}>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  currentStep === 'tips' ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'
+                }`}
+              >
                 3
               </div>
               <span className="ml-2 text-sm font-medium">Preparation Tips</span>
@@ -244,60 +257,52 @@ const InterviewExperienceFormPage: React.FC = () => {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-800">{error}</p>
+            <div className="notification-error">
+              <span className="notification-content">{error}</span>
             </div>
           )}
 
           {/* Step 1: Basic Info */}
           {currentStep === 'basic' && (
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company Name *
-                </label>
+              <div className="form-group">
+                <label className="form-label">Company Name *</label>
                 <input
                   type="text"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                   placeholder="e.g., Google, Microsoft, Amazon"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Role *
-                </label>
+              <div className="form-group">
+                <label className="form-label">Role *</label>
                 <input
                   type="text"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                   placeholder="e.g., Software Engineer, Product Manager"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Interview Date *
-                </label>
+              <div className="form-group">
+                <label className="form-label">Interview Date *</label>
                 <input
                   type="date"
                   value={interviewDate}
                   onChange={(e) => setInterviewDate(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Outcome
-                </label>
+              <div className="form-group">
+                <label className="form-label">Outcome</label>
                 <select
                   value={outcome}
                   onChange={(e) => setOutcome(e.target.value as any)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                 >
                   <option value="pending">Pending</option>
                   <option value="offer">Offer</option>
@@ -306,14 +311,12 @@ const InterviewExperienceFormPage: React.FC = () => {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Overall Difficulty
-                </label>
+              <div className="form-group">
+                <label className="form-label">Overall Difficulty</label>
                 <select
                   value={overallDifficulty}
                   onChange={(e) => setOverallDifficulty(e.target.value as any)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                 >
                   <option value="easy">Easy</option>
                   <option value="medium">Medium</option>
@@ -341,14 +344,12 @@ const InterviewExperienceFormPage: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Round Type
-                      </label>
+                    <div className="form-group">
+                      <label className="form-label">Round Type</label>
                       <select
                         value={round.roundType}
                         onChange={(e) => handleRoundChange(roundIndex, 'roundType', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="input-field"
                       >
                         <option value="phone-screen">Phone Screen</option>
                         <option value="technical">Technical</option>
@@ -360,28 +361,26 @@ const InterviewExperienceFormPage: React.FC = () => {
                       </select>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Duration (minutes)
-                      </label>
+                    <div className="form-group">
+                      <label className="form-label">Duration (minutes)</label>
                       <input
                         type="number"
                         value={round.duration}
-                        onChange={(e) => handleRoundChange(roundIndex, 'duration', parseInt(e.target.value))}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        onChange={(e) =>
+                          handleRoundChange(roundIndex, 'duration', parseInt(e.target.value))
+                        }
+                        className="input-field"
                         min="1"
                       />
                     </div>
                   </div>
 
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Difficulty
-                    </label>
+                  <div className="form-group">
+                    <label className="form-label">Difficulty</label>
                     <select
                       value={round.difficulty}
                       onChange={(e) => handleRoundChange(roundIndex, 'difficulty', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input-field"
                     >
                       <option value="easy">Easy</option>
                       <option value="medium">Medium</option>
@@ -389,51 +388,48 @@ const InterviewExperienceFormPage: React.FC = () => {
                     </select>
                   </div>
 
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Topics Covered
-                    </label>
+                  <div className="form-group">
+                    <label className="form-label">Topics Covered</label>
                     {round.topics.map((topic, topicIndex) => (
                       <div key={topicIndex} className="flex gap-2 mb-2">
                         <input
                           type="text"
                           value={topic}
-                          onChange={(e) => handleTopicChange(roundIndex, topicIndex, e.target.value)}
-                          className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          onChange={(e) =>
+                            handleTopicChange(roundIndex, topicIndex, e.target.value)
+                          }
+                          className="input-field flex-1"
                           placeholder="e.g., Data Structures, Algorithms"
                         />
                         <button
                           onClick={() => handleRemoveTopic(roundIndex, topicIndex)}
-                          className="px-3 py-2 text-red-600 hover:text-red-800"
+                          className="btn-danger btn-sm"
                         >
                           Remove
                         </button>
                       </div>
                     ))}
-                    <button
-                      onClick={() => handleAddTopic(roundIndex)}
-                      className="text-blue-600 hover:text-blue-800 text-sm"
-                    >
+                    <button onClick={() => handleAddTopic(roundIndex)} className="btn-ghost btn-sm">
                       + Add Topic
                     </button>
                   </div>
 
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Questions Asked
-                    </label>
+                  <div className="form-group">
+                    <label className="form-label">Questions Asked</label>
                     {round.questions.map((question, questionIndex) => (
                       <div key={questionIndex} className="flex gap-2 mb-2">
                         <input
                           type="text"
                           value={question}
-                          onChange={(e) => handleQuestionChange(roundIndex, questionIndex, e.target.value)}
-                          className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          onChange={(e) =>
+                            handleQuestionChange(roundIndex, questionIndex, e.target.value)
+                          }
+                          className="input-field flex-1"
                           placeholder="Enter a question that was asked"
                         />
                         <button
                           onClick={() => handleRemoveQuestion(roundIndex, questionIndex)}
-                          className="px-3 py-2 text-red-600 hover:text-red-800"
+                          className="btn-danger btn-sm"
                         >
                           Remove
                         </button>
@@ -441,20 +437,18 @@ const InterviewExperienceFormPage: React.FC = () => {
                     ))}
                     <button
                       onClick={() => handleAddQuestion(roundIndex)}
-                      className="text-blue-600 hover:text-blue-800 text-sm"
+                      className="btn-ghost btn-sm"
                     >
                       + Add Question
                     </button>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Notes
-                    </label>
+                  <div className="form-group">
+                    <label className="form-label">Notes</label>
                     <textarea
                       value={round.notes}
                       onChange={(e) => handleRoundChange(roundIndex, 'notes', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input-field"
                       rows={3}
                       placeholder="Any additional notes about this round..."
                     />
@@ -462,10 +456,7 @@ const InterviewExperienceFormPage: React.FC = () => {
                 </div>
               ))}
 
-              <button
-                onClick={handleAddRound}
-                className="w-full py-2 border-2 border-dashed border-gray-300 rounded-md text-gray-600 hover:border-blue-500 hover:text-blue-600"
-              >
+              <button onClick={handleAddRound} className="btn-ghost w-full border-2 border-dashed">
                 + Add Another Round
               </button>
             </div>
@@ -474,11 +465,9 @@ const InterviewExperienceFormPage: React.FC = () => {
           {/* Step 3: Preparation Tips */}
           {currentStep === 'tips' && (
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Preparation Tips
-                </label>
-                <p className="text-sm text-gray-600 mb-4">
+              <div className="form-group">
+                <label className="form-label">Preparation Tips</label>
+                <p className="form-helper-text">
                   Share tips that helped you prepare for this interview
                 </p>
                 {preparationTips.map((tip, index) => (
@@ -487,23 +476,17 @@ const InterviewExperienceFormPage: React.FC = () => {
                       type="text"
                       value={tip}
                       onChange={(e) => handleTipChange(index, e.target.value)}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input-field flex-1"
                       placeholder="e.g., Practice LeetCode medium problems"
                     />
                     {preparationTips.length > 1 && (
-                      <button
-                        onClick={() => handleRemoveTip(index)}
-                        className="px-3 py-2 text-red-600 hover:text-red-800"
-                      >
+                      <button onClick={() => handleRemoveTip(index)} className="btn-danger btn-sm">
                         Remove
                       </button>
                     )}
                   </div>
                 ))}
-                <button
-                  onClick={handleAddTip}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
-                >
+                <button onClick={handleAddTip} className="btn-ghost btn-sm">
                   + Add Tip
                 </button>
               </div>
@@ -515,27 +498,25 @@ const InterviewExperienceFormPage: React.FC = () => {
             <button
               onClick={handleBack}
               disabled={currentStep === 'basic'}
-              className={`px-6 py-2 rounded-md ${
+              className={
                 currentStep === 'basic'
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+                  ? 'btn-secondary opacity-50 cursor-not-allowed'
+                  : 'btn-secondary'
+              }
             >
               Back
             </button>
 
             {currentStep !== 'tips' ? (
-              <button
-                onClick={handleNext}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
+              <button onClick={handleNext} className="btn-primary">
                 Next
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400"
+                className="btn-primary"
+                style={{ backgroundColor: '#10b981', borderColor: '#10b981' }}
               >
                 {loading ? 'Submitting...' : 'Submit Experience'}
               </button>

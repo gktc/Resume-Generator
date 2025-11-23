@@ -106,7 +106,7 @@ export class ProfileController {
           success: false,
           error: {
             code: 'VALIDATION_ERROR',
-            message: validation.message,
+            message: `Missing required fields: ${validation.missingFields.join(', ')}`,
           },
         });
       }

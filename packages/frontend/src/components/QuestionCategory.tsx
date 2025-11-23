@@ -149,10 +149,7 @@ const QuestionCategory = ({ title, description, questions, color }: QuestionCate
               {/* Expanded Content */}
               {isExpanded && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
-                  <AnswerFramework
-                    question={question}
-                    category={question.category}
-                  />
+                  <AnswerFramework question={question} category={question.category} />
                 </div>
               )}
             </div>

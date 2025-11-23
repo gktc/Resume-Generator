@@ -43,68 +43,58 @@ const TemplateSelector = ({ onTemplateSelected }: TemplateSelectorProps) => {
   const categories = ['all', 'modern', 'classic', 'creative', 'academic', 'technical'];
 
   const filteredTemplates =
-    filterCategory === 'all'
-      ? templates
-      : templates.filter((t) => t.category === filterCategory);
+    filterCategory === 'all' ? templates : templates.filter((t) => t.category === filterCategory);
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading templates...</p>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p className="text-gray-600">Loading templates...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-        <div className="flex items-center mb-4">
-          <svg
-            className="w-6 h-6 text-red-600 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span className="text-red-800 font-semibold">Error Loading Templates</span>
+      <div className="notification-error">
+        <svg className="notification-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <div className="notification-content">
+          <span className="font-semibold">Error Loading Templates</span>
+          <p className="mt-1">{error}</p>
+          <button onClick={fetchTemplates} className="btn-danger btn-sm mt-2">
+            Try Again
+          </button>
         </div>
-        <p className="text-red-700 mb-4">{error}</p>
-        <button
-          onClick={fetchTemplates}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-        >
-          Try Again
-        </button>
       </div>
     );
   }
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Choose a Template</h2>
-      <p className="text-gray-600 mb-6">
-        Select a professional template that best fits your industry and personal style.
-      </p>
+      <div className="page-header">
+        <h2 className="page-title">Choose a Template</h2>
+        <p className="page-subtitle">
+          Select a professional template that best fits your industry and personal style.
+        </p>
+      </div>
 
       {/* Category Filter */}
-      <div className="mb-6">
+      <div className="section">
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setFilterCategory(category)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filterCategory === category
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className={
+                filterCategory === category ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'
+              }
             >
               {category.charAt(0).toUpperCase() + category.slice(1)}
             </button>
@@ -114,13 +104,8 @@ const TemplateSelector = ({ onTemplateSelected }: TemplateSelectorProps) => {
 
       {/* Templates Grid */}
       {filteredTemplates.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <svg
-            className="w-16 h-16 text-gray-400 mx-auto mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+        <div className="empty-state">
+          <svg className="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -128,7 +113,7 @@ const TemplateSelector = ({ onTemplateSelected }: TemplateSelectorProps) => {
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-gray-600">No templates found in this category</p>
+          <p className="empty-state-text">No templates found in this category</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -136,10 +121,10 @@ const TemplateSelector = ({ onTemplateSelected }: TemplateSelectorProps) => {
             <div
               key={template.id}
               onClick={() => handleTemplateClick(template)}
-              className={`cursor-pointer rounded-lg border-2 transition-all hover:shadow-lg ${
+              className={`card-interactive ${
                 selectedTemplate?.id === template.id
                   ? 'border-blue-600 shadow-lg ring-2 ring-blue-200'
-                  : 'border-gray-200 hover:border-blue-300'
+                  : ''
               }`}
             >
               {/* Template Preview Image */}
@@ -185,9 +170,7 @@ const TemplateSelector = ({ onTemplateSelected }: TemplateSelectorProps) => {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold text-gray-900">{template.name}</h3>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                    {template.category}
-                  </span>
+                  <span className="badge-neutral badge-sm">{template.category}</span>
                 </div>
                 <p className="text-sm text-gray-600">{template.description}</p>
               </div>
@@ -198,16 +181,16 @@ const TemplateSelector = ({ onTemplateSelected }: TemplateSelectorProps) => {
 
       {/* Selected Template Details */}
       {selectedTemplate && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-          <h3 className="font-semibold text-blue-900 mb-2">Selected Template</h3>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-900 font-medium">{selectedTemplate.name}</p>
-              <p className="text-sm text-blue-700">{selectedTemplate.description}</p>
+        <div className="notification-info mb-6">
+          <div className="notification-content">
+            <h3 className="font-semibold mb-2">Selected Template</h3>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">{selectedTemplate.name}</p>
+                <p className="text-sm">{selectedTemplate.description}</p>
+              </div>
+              <span className="badge-info">{selectedTemplate.category}</span>
             </div>
-            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-              {selectedTemplate.category}
-            </span>
           </div>
         </div>
       )}
@@ -217,7 +200,7 @@ const TemplateSelector = ({ onTemplateSelected }: TemplateSelectorProps) => {
         <button
           onClick={handleContinue}
           disabled={!selectedTemplate}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center"
+          className="btn-primary disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center"
         >
           Continue to Generation
           <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
