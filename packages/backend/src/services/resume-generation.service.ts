@@ -181,8 +181,11 @@ export class ResumeGenerationService {
       };
     });
 
+    // Consolidate experiences from the same company
+    const consolidatedExperiences = this.consolidateCompanyExperiences(scoredExperiences);
+
     // Sort by relevance and select top experiences
-    const sortedExperiences = scoredExperiences.sort((a, b) => b.relevanceScore - a.relevanceScore);
+    const sortedExperiences = consolidatedExperiences.sort((a, b) => b.relevanceScore - a.relevanceScore);
     const selectedExperiences = sortedExperiences.slice(0, 5); // Top 5 most relevant
 
     // Score skills
@@ -241,6 +244,261 @@ export class ResumeGenerationService {
       skills: selectedSkills,
       projects: selectedProjects,
     };
+  }
+
+  /**
+   * Consolidate multiple experiences from the same company
+   * Merges overlapping or consecutive roles at the same company
+   */
+  private consolidateCompanyExperiences(
+    experiences: SelectedWorkExperience[]
+  ): SelectedWorkExperience[] {
+    // Group experiences by company (normalize company names)
+    const companyGroups = new Map<string, SelectedWorkExperience[]>();
+
+    experiences.forEach((exp) => {
+      const companyKey = this.normalizeCompanyName(exp.company);
+      if (!companyGroups.has(companyKey)) {
+        companyGroups.set(companyKey, []);
+      }
+      companyGroups.get(companyKey)!.push(exp);
+    });
+
+    const consolidated: SelectedWorkExperience[] = [];
+
+    companyGroups.forEach((companyExps, _companyKey) => {
+      if (companyExps.length === 1) {
+        // Single experience at this company, keep as is
+        consolidated.push(companyExps[0]);
+      } else {
+        // Multiple experiences at same company - consolidate intelligently
+        // Sort by start date (most recent first)
+        const sorted = companyExps.sort((a, b) => {
+          const dateA = new Date(a.startDate).getTime();
+          const dateB = new Date(b.startDate).getTime();
+          return dateB - dateA;
+        });
+
+        // Detect if these are truly different roles or duplicates
+        const uniquePositions = new Set(sorted.map((exp) => exp.position.toLowerCase().trim()));
+
+        if (uniquePositions.size === 1 && this.hasOverlappingDates(sorted)) {
+          // Same position with overlapping dates - likely duplicates, merge completely
+          const merged = this.mergeIdenticalRoles(sorted);
+          consolidated.push(merged);
+        } else {
+          // Different positions or non-overlapping - show career progression
+          const progression = this.createCareerProgression(sorted);
+          consolidated.push(progression);
+        }
+      }
+    });
+
+    // Sort all consolidated experiences by start date (most recent first)
+    return consolidated.sort((a, b) => {
+      const dateA = new Date(a.startDate).getTime();
+      const dateB = new Date(b.startDate).getTime();
+      return dateB - dateA;
+    });
+  }
+
+  /**
+   * Normalize company name for better matching
+   */
+  private normalizeCompanyName(company: string): string {
+    return company
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/\b(inc|corp|corporation|ltd|limited|llc)\b\.?/gi, '')
+      .trim();
+  }
+
+  /**
+   * Check if experiences have overlapping dates
+   */
+  private hasOverlappingDates(experiences: SelectedWorkExperience[]): boolean {
+    for (let i = 0; i < experiences.length - 1; i++) {
+      const current = experiences[i];
+      const next = experiences[i + 1];
+
+      const currentStart = new Date(current.startDate).getTime();
+      const currentEnd = current.endDate ? new Date(current.endDate).getTime() : Date.now();
+      const nextStart = new Date(next.startDate).getTime();
+      const nextEnd = next.endDate ? new Date(next.endDate).getTime() : Date.now();
+
+      // Check if dates overlap
+      if (currentStart <= nextEnd && nextStart <= currentEnd) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Merge identical roles (likely duplicates)
+   */
+  private mergeIdenticalRoles(experiences: SelectedWorkExperience[]): SelectedWorkExperience {
+    const primary = experiences[0];
+
+    // Collect all unique achievements and rank them
+    const achievementScores = new Map<string, number>();
+    const allTechnologies = new Set<string>();
+
+    experiences.forEach((exp) => {
+      exp.achievements.forEach((achievement: string) => {
+        const normalized = achievement.trim();
+        // Score achievements based on length, numbers, and action verbs
+        const score = this.scoreAchievement(normalized);
+        achievementScores.set(normalized, Math.max(achievementScores.get(normalized) || 0, score));
+      });
+
+      exp.technologies.forEach((tech: string) => {
+        allTechnologies.add(tech);
+      });
+    });
+
+    // Select top achievements
+    const topAchievements = Array.from(achievementScores.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([achievement]) => achievement);
+
+    // Use the widest date range
+    const startDate = experiences[experiences.length - 1].startDate; // Earliest
+    const endDate = experiences[0].endDate; // Latest
+
+    return {
+      ...primary,
+      startDate,
+      endDate,
+      achievements: topAchievements,
+      technologies: Array.from(allTechnologies),
+      relevanceScore: Math.max(...experiences.map((e) => e.relevanceScore)),
+    };
+  }
+
+  /**
+   * Create career progression entry showing role changes
+   */
+  private createCareerProgression(experiences: SelectedWorkExperience[]): SelectedWorkExperience {
+    const primary = experiences[0]; // Most recent role
+
+    // Collect all achievements and rank them
+    const achievementScores = new Map<string, number>();
+    const allTechnologies = new Set<string>();
+    const positions: string[] = [];
+
+    experiences.forEach((exp) => {
+      if (!positions.includes(exp.position)) {
+        positions.push(exp.position);
+      }
+
+      exp.achievements.forEach((achievement: string) => {
+        const normalized = achievement.trim();
+        const score = this.scoreAchievement(normalized);
+        achievementScores.set(normalized, Math.max(achievementScores.get(normalized) || 0, score));
+      });
+
+      exp.technologies.forEach((tech: string) => {
+        allTechnologies.add(tech);
+      });
+    });
+
+    // Select top achievements
+    const topAchievements = Array.from(achievementScores.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([achievement]) => achievement);
+
+    // Create position title showing progression
+    let positionTitle = primary.position;
+    if (positions.length > 1) {
+      const otherPositions = positions.slice(1).join(', ');
+      positionTitle = `${primary.position} (promoted from ${otherPositions})`;
+    }
+
+    // Use the widest date range
+    const startDate = experiences[experiences.length - 1].startDate;
+    const endDate = experiences[0].endDate;
+
+    return {
+      ...primary,
+      position: positionTitle,
+      startDate,
+      endDate,
+      achievements: topAchievements,
+      technologies: Array.from(allTechnologies),
+      relevanceScore: Math.max(...experiences.map((e) => e.relevanceScore)),
+    };
+  }
+
+  /**
+   * Score achievement quality
+   * Higher score = better achievement
+   */
+  private scoreAchievement(achievement: string): number {
+    let score = 0;
+
+    // Bonus for having numbers (quantifiable results)
+    const hasNumbers = /\d+/.test(achievement);
+    if (hasNumbers) {
+      score += 10;
+      // Extra bonus for percentages
+      if (/%/.test(achievement)) {
+        score += 5;
+      }
+    }
+
+    // Bonus for strong action verbs
+    const strongVerbs = [
+      'developed',
+      'implemented',
+      'designed',
+      'led',
+      'managed',
+      'created',
+      'improved',
+      'increased',
+      'reduced',
+      'optimized',
+      'automated',
+      'built',
+      'architected',
+      'launched',
+      'delivered',
+      'achieved',
+      'spearheaded',
+    ];
+    const startsWithStrongVerb = strongVerbs.some((verb) =>
+      achievement.toLowerCase().startsWith(verb)
+    );
+    if (startsWithStrongVerb) {
+      score += 8;
+    }
+
+    // Bonus for reasonable length (not too short, not too long)
+    const wordCount = achievement.split(/\s+/).length;
+    if (wordCount >= 8 && wordCount <= 25) {
+      score += 5;
+    }
+
+    // Bonus for impact words
+    const impactWords = [
+      'revenue',
+      'efficiency',
+      'performance',
+      'scalability',
+      'quality',
+      'time',
+      'cost',
+    ];
+    const hasImpactWord = impactWords.some((word) => achievement.toLowerCase().includes(word));
+    if (hasImpactWord) {
+      score += 5;
+    }
+
+    return score;
   }
 
   /**
@@ -348,6 +606,8 @@ export class ResumeGenerationService {
 
     return score;
   }
+
+
 
   /**
    * Optimize content with AI

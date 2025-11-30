@@ -1,6 +1,6 @@
-# ATS Resume Builder
+# Caliber
 
-An AI-powered resume builder that generates ATS-optimized resumes tailored to specific job descriptions. The application helps job seekers create targeted resumes and prepare for interviews using community-contributed interview experiences.
+An AI-powered resume builder that generates ATS-optimized resumes tailored to specific job descriptions. Caliber helps job seekers create targeted resumes and prepare for interviews using community-contributed interview experiences.
 
 ## Features
 
@@ -109,7 +109,7 @@ The application will be available at:
 ## Project Structure
 
 ```
-ats-resume-builder/
+caliber/
 ├── packages/
 │   ├── backend/              # Express.js API server
 │   │   ├── src/

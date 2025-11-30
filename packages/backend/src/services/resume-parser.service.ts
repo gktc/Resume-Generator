@@ -54,6 +54,18 @@ export interface ParsedResume {
 
 export class ResumeParserService {
   /**
+   * Parse date string safely, returning null for invalid dates
+   */
+  private parseDate(dateStr: string | null | undefined): Date | null {
+    if (!dateStr || dateStr.trim() === '' || dateStr.toLowerCase() === 'present') {
+      return null;
+    }
+
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  /**
    * Parse a resume file and extract structured data
    */
   async parseResume(
@@ -367,34 +379,44 @@ Important:
       if (editedData.workExperience && editedData.workExperience.length > 0) {
         console.log(`Inserting ${editedData.workExperience.length} work experiences`);
         await tx.workExperience.createMany({
-          data: editedData.workExperience.map((exp, index) => ({
-            userId,
-            company: exp.company,
-            position: exp.position,
-            startDate: new Date(exp.startDate),
-            endDate: exp.endDate ? new Date(exp.endDate) : null,
-            description: exp.description,
-            achievements: exp.achievements,
-            technologies: exp.technologies,
-            order: index,
-          })),
+          data: editedData.workExperience.map((exp, index) => {
+            const startDate = this.parseDate(exp.startDate) || new Date();
+            const endDate = this.parseDate(exp.endDate);
+
+            return {
+              userId,
+              company: exp.company,
+              position: exp.position,
+              startDate,
+              endDate,
+              description: exp.description,
+              achievements: exp.achievements,
+              technologies: exp.technologies,
+              order: index,
+            };
+          }),
         });
       }
 
       // Insert educations
       if (editedData.education && editedData.education.length > 0) {
         await tx.education.createMany({
-          data: editedData.education.map((edu, index) => ({
-            userId,
-            institution: edu.institution,
-            degree: edu.degree,
-            fieldOfStudy: edu.fieldOfStudy,
-            startDate: new Date(edu.startDate),
-            endDate: edu.endDate ? new Date(edu.endDate) : null,
-            gpa: edu.gpa,
-            achievements: edu.achievements,
-            order: index,
-          })),
+          data: editedData.education.map((edu, index) => {
+            const startDate = this.parseDate(edu.startDate) || new Date();
+            const endDate = this.parseDate(edu.endDate);
+
+            return {
+              userId,
+              institution: edu.institution,
+              degree: edu.degree,
+              fieldOfStudy: edu.fieldOfStudy,
+              startDate,
+              endDate,
+              gpa: edu.gpa,
+              achievements: edu.achievements,
+              order: index,
+            };
+          }),
         });
       }
 
@@ -415,18 +437,23 @@ Important:
       // Insert projects
       if (editedData.projects && editedData.projects.length > 0) {
         await tx.project.createMany({
-          data: editedData.projects.map((proj, index) => ({
-            userId,
-            title: proj.title,
-            description: proj.description,
-            technologies: proj.technologies,
-            url: proj.url,
-            githubUrl: proj.githubUrl,
-            startDate: proj.startDate ? new Date(proj.startDate) : null,
-            endDate: proj.endDate ? new Date(proj.endDate) : null,
-            highlights: proj.highlights,
-            order: index,
-          })),
+          data: editedData.projects.map((proj, index) => {
+            const startDate = this.parseDate(proj.startDate);
+            const endDate = this.parseDate(proj.endDate);
+
+            return {
+              userId,
+              title: proj.title,
+              description: proj.description,
+              technologies: proj.technologies,
+              url: proj.url,
+              githubUrl: proj.githubUrl,
+              startDate,
+              endDate,
+              highlights: proj.highlights,
+              order: index,
+            };
+          }),
         });
       }
     });

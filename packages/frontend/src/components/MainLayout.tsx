@@ -117,7 +117,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   />
                 </svg>
               </button>
-              <h1 className="ml-4 lg:ml-4 text-xl font-bold text-gray-900">ATS Resume Builder</h1>
+              <h1 className="ml-4 lg:ml-4 text-xl font-bold text-gray-900">Caliber</h1>
             </div>
             <div className="flex items-center">
               {/* Profile dropdown */}
@@ -180,10 +180,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </div>
       </nav>
 
-      <div className="flex pt-16">
+      <div className="flex pt-16 min-h-screen">
         {/* Sidebar for desktop */}
-        <aside className="hidden lg:flex lg:flex-shrink-0">
-          <div className="flex flex-col w-64 border-r border-gray-200 bg-white">
+        <aside className="hidden lg:flex lg:flex-shrink-0 lg:fixed lg:left-0 lg:top-16 lg:bottom-0">
+          <div className="flex flex-col w-64 border-r border-gray-200 bg-white h-full">
             <nav className="flex-1 px-4 py-6 space-y-1">
               {navigationItems.map((item) => (
                 <Link
@@ -249,7 +249,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         )}
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto lg:ml-64">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8">{children}</div>
         </main>
       </div>

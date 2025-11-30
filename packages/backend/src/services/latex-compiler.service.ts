@@ -70,8 +70,13 @@ export class LaTeXCompilerService {
         filePath: outputPath,
       };
     } catch (error: any) {
-      // Clean up on error
-      await this.cleanupTempDir(tempDir);
+      // Log the error and keep temp files for debugging
+      console.error('LaTeX compilation error:', error);
+      console.error('Temp directory (kept for debugging):', tempDir);
+      
+      // Don't clean up on error so we can inspect the files
+      // await this.cleanupTempDir(tempDir);
+      
       throw new Error(`LaTeX compilation failed: ${error.message}`);
     }
   }
@@ -223,43 +228,49 @@ ${highlights}
     const containerName = process.env.LATEX_CONTAINER_NAME || 'ats-latex';
 
     try {
-      // Get absolute path for Docker volume mounting
-      const absoluteWorkDir = path.resolve(workDir);
+      // The workDir is already in latex-temp which is mounted to /latex-temp in the container
+      // Get the relative path from latex-temp
+      const relativePath = path.relative(this.latexTempDir, workDir);
+      const containerPath = `/latex-temp/${relativePath}`;
 
       // Run pdflatex twice for proper references (needed for TOC, references, etc.)
       for (let i = 0; i < 2; i++) {
         // Docker command to execute pdflatex in the container
-        const command = `docker exec ${containerName} pdflatex -interaction=nonstopmode -output-directory=/work "${texFile}"`;
+        // Use the mounted volume path instead of copying files
+        const command = `docker exec ${containerName} pdflatex -interaction=nonstopmode -output-directory=${containerPath} ${containerPath}/${texFile}`;
 
-        // Copy files to container
-        await execAsync(`docker cp "${absoluteWorkDir}/." ${containerName}:/work/`, {
-          timeout: 5000,
-        });
+        try {
+          // Execute pdflatex in container
+          const { stdout, stderr } = await execAsync(command, {
+            timeout: this.timeout,
+            maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+          });
 
-        // Execute pdflatex in container
-        await execAsync(command, {
-          timeout: this.timeout,
-          maxBuffer: 10 * 1024 * 1024, // 10MB buffer
-        });
-
-        // Copy PDF back from container
-        const pdfFile = `${baseFileName}.pdf`;
-        await execAsync(`docker cp ${containerName}:/work/${pdfFile} "${absoluteWorkDir}/"`, {
-          timeout: 5000,
-        });
+          // Log LaTeX output for debugging
+          if (stderr) {
+            console.log('LaTeX stderr (warnings):', stderr);
+          }
+          if (stdout && stdout.includes('!')) {
+            console.log('LaTeX errors detected:', stdout);
+          }
+        } catch (execError: any) {
+          // LaTeX warnings go to stderr which causes execAsync to throw
+          // Check if PDF was actually created before treating as error
+          const pdfPath = path.join(workDir, `${baseFileName}.pdf`);
+          try {
+            await fs.access(pdfPath);
+            // PDF exists, so compilation succeeded despite warnings
+            console.log('LaTeX compilation succeeded with warnings');
+          } catch {
+            // PDF doesn't exist, this is a real error
+            throw execError;
+          }
+        }
       }
 
-      // Check if PDF was created
+      // Final check if PDF was created
       const pdfPath = path.join(workDir, `${baseFileName}.pdf`);
       await fs.access(pdfPath);
-
-      // Clean up files in container
-      await execAsync(`docker exec ${containerName} rm -rf /work/*`, {
-        timeout: 5000,
-      }).catch(() => {
-        // Ignore cleanup errors
-        console.warn('Failed to clean up container work directory');
-      });
     } catch (error: any) {
       if (error.killed) {
         throw new Error('LaTeX compilation timed out after 30 seconds. Please simplify your resume or try a different template.');

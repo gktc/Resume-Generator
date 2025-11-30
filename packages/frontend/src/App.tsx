@@ -40,7 +40,7 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true }}>
           <ToastProvider>
             <AuthProvider>
               <ToastContainer />
