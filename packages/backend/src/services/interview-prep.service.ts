@@ -153,10 +153,25 @@ Return a JSON array with this structure:
 ]`;
 
     try {
-      const questions = await aiService.generateJSON<any[]>(prompt, systemPrompt, {
+      const response = await aiService.generateJSON<any>(prompt, systemPrompt, {
         temperature: 0.7,
         maxTokens: 3000,
       });
+
+      console.log('Interview questions response type:', typeof response);
+      console.log('Is array:', Array.isArray(response));
+      console.log('Response keys:', Object.keys(response));
+
+      // Handle both array and object with questions property
+      let questions: any[];
+      if (Array.isArray(response)) {
+        questions = response;
+      } else if (response.questions && Array.isArray(response.questions)) {
+        questions = response.questions;
+      } else {
+        console.error('Unexpected response format:', response);
+        throw new Error('Invalid response format from AI');
+      }
 
       return questions.map((q) => ({
         question: q.question,

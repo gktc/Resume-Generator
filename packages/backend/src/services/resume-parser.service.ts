@@ -72,14 +72,28 @@ export class ResumeParserService {
     file: Express.Multer.File,
     userId: string
   ): Promise<{ id: string; parsedData: ParsedResumeData }> {
+    console.log('=== Starting resume parsing ===');
+    console.log('File:', file.filename, 'Size:', file.size, 'Type:', file.mimetype);
+    console.log('User ID:', userId);
+
     try {
-      // Extract text from file
+      // Step 1: Extract text from file
+      console.log('Step 1: Extracting text from file...');
       const extractedText = await this.extractText(file);
+      console.log('Text extracted successfully. Length:', extractedText.length);
+      console.log('First 200 chars:', extractedText.substring(0, 200));
 
-      // Use AI to structure the data
+      // Step 2: Use AI to structure the data
+      console.log('Step 2: Structuring data with AI...');
       const parsedData = await this.structureData(extractedText);
+      console.log('Data structured successfully');
+      console.log('Work Experience count:', parsedData.workExperience?.length || 0);
+      console.log('Education count:', parsedData.education?.length || 0);
+      console.log('Skills count:', parsedData.skills?.length || 0);
+      console.log('Projects count:', parsedData.projects?.length || 0);
 
-      // Store parsed data temporarily
+      // Step 3: Store parsed data temporarily
+      console.log('Step 3: Storing parsed data...');
       const parseId = await this.storeParsedData(
         userId,
         file.filename,
@@ -87,10 +101,14 @@ export class ResumeParserService {
         extractedText,
         parsedData
       );
+      console.log('Data stored with ID:', parseId);
+      console.log('=== Resume parsing completed successfully ===');
 
       return { id: parseId, parsedData };
     } catch (error) {
-      console.error('Resume parsing error:', error);
+      console.error('=== Resume parsing error ===');
+      console.error('Error details:', error);
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
       throw new Error('Failed to parse resume. Please check the file format and try again.');
     }
   }
